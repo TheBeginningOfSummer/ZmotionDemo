@@ -1,6 +1,7 @@
 ﻿using cszmcaux;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace ZmotionDemo
 {
@@ -31,6 +32,25 @@ namespace ZmotionDemo
         {
             Axes.Add(new Axis(type, number, G_handle));
         }
+
+        public void SetOutput(int num, uint value)
+        {
+            Zmcaux.ZAux_Direct_SetOp(G_handle, num, value);
+        }
+
+        public uint GetOutput(int num)
+        {
+            uint value = 2;
+            Zmcaux.ZAux_Direct_GetOp(G_handle, num, ref value);
+            return value;
+        }
+
+        public uint GetInput(int num)
+        {
+            uint value = 2;
+            Zmcaux.ZAux_Direct_GetIn(G_handle, num, ref value);
+            return value;
+        }
     }
 
     public class Axis
@@ -39,6 +59,22 @@ namespace ZmotionDemo
         public int AxisNumber { get; set; }
         public IntPtr Handle { get; private set; }
         public int Direction { get; set; } = 1;
+        private bool isMoving = false;
+        public bool IsMoving
+        {
+            get { return isMoving; }
+            set
+            {
+                if (isMoving != value)
+                {
+                    isMoving = value;
+                    Zmcaux.ZAux_Direct_GetDpos(Handle, AxisNumber, ref CurrentPosition);
+                    MovingAction?.Invoke(CurrentPosition);
+                }
+            }
+        }
+        public float CurrentPosition;
+        public Action<float> MovingAction;
 
         public Axis(int type, int number, IntPtr handle)
         {
@@ -48,6 +84,7 @@ namespace ZmotionDemo
             Zmcaux.ZAux_Direct_SetAtype(Handle, AxisNumber, AxisType);
         }
 
+        #region 初始化
         /// <summary>
         /// 初始化轴参数
         /// </summary>
@@ -88,7 +125,21 @@ namespace ZmotionDemo
             if (reverse >= 0)
                 Zmcaux.ZAux_Direct_SetRevIn(Handle, AxisNumber, reverse);
         }
+        /// <summary>
+        /// 设置软限位
+        /// </summary>
+        /// <param name="forward">正限位距离</param>
+        /// <param name="reverse">负限位距离</param>
+        public void SetLimit(float forward = -1, float reverse = -1)
+        {
+            if (forward >= 0)
+                Zmcaux.ZAux_Direct_SetFsLimit(Handle, AxisNumber, forward);
+            if (reverse >= 0)
+                Zmcaux.ZAux_Direct_SetRsLimit(Handle, AxisNumber, reverse);
+        }
+        #endregion
 
+        #region 运动
         public int HomeCorrect(int mode = 4)
         {
             return Zmcaux.ZAux_Direct_Single_Datum(Handle, AxisNumber, mode);
@@ -104,11 +155,10 @@ namespace ZmotionDemo
         /// <returns></returns>
         public int Home()
         {
-            int status = 0; float position = 0;
-            Zmcaux.ZAux_Direct_GetIfIdle(Handle, AxisNumber, ref status);
-            if (status == 0) return 0;
-            Zmcaux.ZAux_Direct_GetDpos(Handle, AxisNumber, ref position);
-            if (position > 0)
+            //int status = 0;
+            //Zmcaux.ZAux_Direct_GetIfIdle(Handle, AxisNumber, ref status);
+            //if (status == 0) return 0;
+            if (CurrentPosition > 0)
             {
                 return Zmcaux.ZAux_Direct_Single_Datum(Handle, AxisNumber, 4);
             }
@@ -118,17 +168,10 @@ namespace ZmotionDemo
             }
         }
         /// <summary>
-        /// 更改运动方向
-        /// </summary>
-        public void ChangeDirection()
-        {
-            Direction = -Direction;
-        }
-        /// <summary>
         /// 连续运动
         /// </summary>
         /// <returns></returns>
-        public int Jog()
+        public int ContinuousMove()
         {
             return Zmcaux.ZAux_Direct_Single_Vmove(Handle, AxisNumber, Direction);
         }
@@ -139,7 +182,7 @@ namespace ZmotionDemo
         /// <returns></returns>
         public int RelativeMove(float distance)
         {
-            return Zmcaux.ZAux_Direct_Single_Move(Handle, AxisNumber, Direction * distance);
+            return Zmcaux.ZAux_Direct_Single_Move(Handle, AxisNumber, distance);
         }
         /// <summary>
         /// 绝对运动
@@ -164,5 +207,79 @@ namespace ZmotionDemo
         {
             return Zmcaux.ZAux_Direct_Single_Cancel(Handle, AxisNumber, mode);
         }
+
+        public void Wait()
+        {
+            Thread.Sleep(500);
+            do
+            {
+                Thread.Sleep(50);
+            } while (IsMoving);
+        }
+
+        public bool Wait(double delay)
+        {
+            int i = 0;
+            Thread.Sleep(500);
+            do
+            {
+                i++;
+                Thread.Sleep(50);
+                if (i * 50 > delay)
+                {
+                    //超时报警，可用委托
+                    return false;
+                }
+            } while (IsMoving);
+            return true;
+        }
+        #endregion
+
+        public float GetSpeed()
+        {
+            float speed = 0;
+            Zmcaux.ZAux_Direct_GetSpeed(Handle, AxisNumber, ref speed);
+            return speed;
+        }
+
+        public float GetMSpeed()
+        {
+            float speed = 0;
+            Zmcaux.ZAux_Direct_GetMspeed(Handle, AxisNumber, ref speed);
+            return speed;
+        }
+        /// <summary>
+        /// 得到坐标
+        /// </summary>
+        /// <returns></returns>
+        public float GetPosition()
+        {
+            float position = 0;
+            Zmcaux.ZAux_Direct_GetDpos(Handle, AxisNumber, ref position);
+            return position;
+        }
+        /// <summary>
+        /// 更新轴状态
+        /// </summary>
+        public void UpdateStatus()
+        {
+            int movingStatus = 0;
+            while (true)
+            {
+                Thread.Sleep(100);
+                Zmcaux.ZAux_Direct_GetIfIdle(Handle, AxisNumber, ref movingStatus);
+                if (movingStatus == 0)
+                    IsMoving = true;
+                else if (movingStatus == -1)
+                    IsMoving = false;
+                if (IsMoving)
+                {
+                    Zmcaux.ZAux_Direct_GetDpos(Handle, AxisNumber, ref CurrentPosition);
+                    MovingAction?.Invoke(CurrentPosition);
+                }
+            }
+        }
+
+        
     }
 }
