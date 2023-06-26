@@ -19,13 +19,10 @@ namespace ZmotionDemo
             try
             {
                 LoadConfig();
-                if (card.Connect())
+                if (card.Connect(TB_IP.Text))
                 {
                     MessageBox.Show("控制器链接成功!", "提示");
-                    if (int.TryParse(TB_AxisType.Text, out var axisType))
-                        InitializeAxes(axisType);
-                    else
-                        MessageBox.Show("初始化轴参数失败。", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    InitializeAxes();
                     Task.Run(UpdateCardStatus);
                     card.Axes[1].MovingAction += YAxisMoving;
                     BGW_Auto.DoWork += BGW_Auto_DoWork;
@@ -74,10 +71,10 @@ namespace ZmotionDemo
                 method();
         }
 
-        public void InitializeAxes(int axisType = 1)
+        public void InitializeAxes()
         {
-            card.AddAxis(axisType, 0);
-            card.AddAxis(axisType, 1);
+            card.AddAxis(int.Parse(TB_XAxisType.Text), 0);
+            card.AddAxis(int.Parse(TB_YAxisType.Text), 1);
             card.Axes[0].Initialize(TB_X脉冲当量.Text, TB_X运行速度.Text, TB_X加速度.Text, TB_X减速度.Text, TB_XS曲线.Text, TB_XCreepSpeed.Text);
             card.Axes[1].Initialize(TB_Y脉冲当量.Text, TB_Y运行速度.Text, TB_Y加速度.Text, TB_Y减速度.Text, TB_YS曲线.Text, TB_YCreepSpeed.Text);
             card.Axes[0].InitializeDatum(int.Parse(TB_X原点信号.Text));
@@ -121,7 +118,8 @@ namespace ZmotionDemo
             TB_LaserOffPos.Text = config.Load("激光关闭位置");
             TB_LaserSignal.Text = config.Load("激光信号");
             TB_切割次数.Text = config.Load("切割次数");
-            TB_AxisType.Text = config.Load("轴类型");
+            TB_XAxisType.Text = config.Load("轴类型");
+            TB_IP.Text = config.Load("IP");
         }
 
         public void SaveConfig()
@@ -157,7 +155,8 @@ namespace ZmotionDemo
             config.Change("激光关闭位置", TB_LaserOffPos.Text);
             config.Change("激光信号", TB_LaserSignal.Text);
             config.Change("切割次数", TB_切割次数.Text);
-            config.Change("轴类型", TB_AxisType.Text);
+            config.Change("轴类型", TB_XAxisType.Text);
+            config.Change("IP", TB_IP.Text);
         }
 
         private void UpdateCardStatus()
@@ -185,6 +184,8 @@ namespace ZmotionDemo
                 MessageBox.Show("Y轴运动中");
                 return;
             }
+            card.Axes[0].Direction = 1;
+            card.Axes[1].Direction = 1;
             card.Axes[0].Home();
             card.Axes[1].Home();
             card.Axes[0].Wait();
@@ -342,6 +343,26 @@ namespace ZmotionDemo
         }
         #endregion
 
+        private void BTN_设置_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                card.Axes[0].Initialize(TB_X脉冲当量.Text, TB_X运行速度.Text, TB_X加速度.Text, TB_X减速度.Text, TB_XS曲线.Text, TB_XCreepSpeed.Text);
+                card.Axes[1].Initialize(TB_Y脉冲当量.Text, TB_Y运行速度.Text, TB_Y加速度.Text, TB_Y减速度.Text, TB_YS曲线.Text, TB_YCreepSpeed.Text);
+                card.Axes[0].InitializeDatum(int.Parse(TB_X原点信号.Text));
+                card.Axes[1].InitializeDatum(int.Parse(TB_Y原点信号.Text));
+                card.Axes[0].SetLimitSignal(int.Parse(TB_X正限位信号.Text), int.Parse(TB_X负限位信号.Text));
+                card.Axes[1].SetLimitSignal(int.Parse(TB_Y正限位信号.Text), int.Parse(TB_Y负限位信号.Text));
+                card.Axes[0].SetLimit(float.Parse(TB_X正软限位.Text), float.Parse(TB_X负软限位.Text));
+                card.Axes[1].SetLimit(float.Parse(TB_Y正软限位.Text), float.Parse(TB_Y负软限位.Text));
+                MessageBox.Show("设置成功。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("设置失败。" + ex.Message, "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void BTN_保存设置_Click(object sender, EventArgs e)
         {
             try
@@ -385,6 +406,7 @@ namespace ZmotionDemo
                 if (int.TryParse(TB_AxisCode.Text, out var axisCode))
                 {
                     Zmcaux.ZAux_Direct_SetDpos(card.G_handle, axisCode, 0);
+                    MessageBox.Show("完成", "校准", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
@@ -447,6 +469,11 @@ namespace ZmotionDemo
             DialogResult result = MessageBox.Show("是否自动运行？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
+                if (BGW_Auto.IsBusy)
+                {
+                    MessageBox.Show("运行中。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
                 if (isAuto)
                     BGW_Auto.RunWorkerAsync();
                 else
@@ -496,8 +523,8 @@ namespace ZmotionDemo
             DialogResult result = MessageBox.Show("是否停止？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
-                card.SetOutput(int.Parse(TB_LaserSignal.Text), 0);
                 Scram();
+                card.SetOutput(int.Parse(TB_LaserSignal.Text), 0);
             }
         }
         #endregion
@@ -674,10 +701,38 @@ namespace ZmotionDemo
             }
         }
 
+        private void BTN_回原点_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                isLaserWork = false;
+                if (card.Axes[0].IsMoving)
+                {
+                    MessageBox.Show("X轴运动中");
+                }
+                else
+                {
+                    card.Axes[0].Home();
+                }
+                if (card.Axes[1].IsMoving)
+                {
+                    MessageBox.Show("Y轴运动中");
+                }
+                else
+                {
+                    card.Axes[1].Home();
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("初始化失败");
+            }
+        }
+
 
 
         #endregion
 
-        
+
     }
 }

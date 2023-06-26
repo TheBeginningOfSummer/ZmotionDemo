@@ -30,10 +30,10 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TP_自动 = new System.Windows.Forms.TabPage();
+            this.BTN_停止 = new System.Windows.Forms.Button();
             this.GB_模式选择 = new System.Windows.Forms.GroupBox();
             this.RB_模式2 = new System.Windows.Forms.RadioButton();
             this.RB_模式1 = new System.Windows.Forms.RadioButton();
-            this.BTN_初始化 = new System.Windows.Forms.Button();
             this.BTN_自动停止 = new System.Windows.Forms.Button();
             this.BTN_自动运行 = new System.Windows.Forms.Button();
             this.BTN_手动模式 = new System.Windows.Forms.Button();
@@ -43,8 +43,6 @@
             this.LB_YSpeed = new System.Windows.Forms.Label();
             this.LB_XSpeed = new System.Windows.Forms.Label();
             this.GB_手动 = new System.Windows.Forms.GroupBox();
-            this.TB_X相对位移量 = new System.Windows.Forms.TextBox();
-            this.label19 = new System.Windows.Forms.Label();
             this.GB_Y = new System.Windows.Forms.GroupBox();
             this.BTN_Y右 = new System.Windows.Forms.Button();
             this.LB_当前Y轴位置 = new System.Windows.Forms.Label();
@@ -66,8 +64,12 @@
             this.LB_当前X轴位置 = new System.Windows.Forms.Label();
             this.BTN_X回原点 = new System.Windows.Forms.Button();
             this.TP_设置 = new System.Windows.Forms.TabPage();
+            this.TB_IP = new System.Windows.Forms.TextBox();
+            this.LB_IP = new System.Windows.Forms.Label();
             this.BTN_保存设置 = new System.Windows.Forms.Button();
             this.GB_切割设置 = new System.Windows.Forms.GroupBox();
+            this.TB_LaserSignal = new System.Windows.Forms.TextBox();
+            this.label26 = new System.Windows.Forms.Label();
             this.TB_终止位置 = new System.Windows.Forms.TextBox();
             this.label25 = new System.Windows.Forms.Label();
             this.TB_切割次数 = new System.Windows.Forms.TextBox();
@@ -80,9 +82,11 @@
             this.label11 = new System.Windows.Forms.Label();
             this.TB_起始位置 = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.TB_AxisType = new System.Windows.Forms.TextBox();
+            this.TB_XAxisType = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.GB_Y轴设置 = new System.Windows.Forms.GroupBox();
+            this.TB_YCreepSpeed = new System.Windows.Forms.TextBox();
+            this.label28 = new System.Windows.Forms.Label();
             this.TB_Y负软限位 = new System.Windows.Forms.TextBox();
             this.TB_Y正软限位 = new System.Windows.Forms.TextBox();
             this.label23 = new System.Windows.Forms.Label();
@@ -104,6 +108,8 @@
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.GB_X轴设置 = new System.Windows.Forms.GroupBox();
+            this.TB_XCreepSpeed = new System.Windows.Forms.TextBox();
+            this.label27 = new System.Windows.Forms.Label();
             this.TB_X负软限位 = new System.Windows.Forms.TextBox();
             this.TB_X正软限位 = new System.Windows.Forms.TextBox();
             this.label22 = new System.Windows.Forms.Label();
@@ -133,13 +139,10 @@
             this.TB_AxisCode = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.BGW_Auto = new System.ComponentModel.BackgroundWorker();
-            this.label26 = new System.Windows.Forms.Label();
-            this.TB_LaserSignal = new System.Windows.Forms.TextBox();
-            this.BTN_停止 = new System.Windows.Forms.Button();
-            this.TB_XCreepSpeed = new System.Windows.Forms.TextBox();
-            this.label27 = new System.Windows.Forms.Label();
-            this.TB_YCreepSpeed = new System.Windows.Forms.TextBox();
-            this.label28 = new System.Windows.Forms.Label();
+            this.TB_YAxisType = new System.Windows.Forms.TextBox();
+            this.label29 = new System.Windows.Forms.Label();
+            this.BTN_设置 = new System.Windows.Forms.Button();
+            this.BTN_回原点 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.TP_自动.SuspendLayout();
             this.GB_模式选择.SuspendLayout();
@@ -172,7 +175,6 @@
             // 
             this.TP_自动.Controls.Add(this.BTN_停止);
             this.TP_自动.Controls.Add(this.GB_模式选择);
-            this.TP_自动.Controls.Add(this.BTN_初始化);
             this.TP_自动.Controls.Add(this.BTN_自动停止);
             this.TP_自动.Controls.Add(this.BTN_自动运行);
             this.TP_自动.Controls.Add(this.BTN_手动模式);
@@ -185,6 +187,16 @@
             this.TP_自动.TabIndex = 0;
             this.TP_自动.Text = "自动";
             this.TP_自动.UseVisualStyleBackColor = true;
+            // 
+            // BTN_停止
+            // 
+            this.BTN_停止.Location = new System.Drawing.Point(666, 304);
+            this.BTN_停止.Name = "BTN_停止";
+            this.BTN_停止.Size = new System.Drawing.Size(75, 23);
+            this.BTN_停止.TabIndex = 7;
+            this.BTN_停止.Text = "全部停止";
+            this.BTN_停止.UseVisualStyleBackColor = true;
+            this.BTN_停止.Click += new System.EventHandler(this.BTN_停止_Click);
             // 
             // GB_模式选择
             // 
@@ -219,16 +231,6 @@
             this.RB_模式1.TabStop = true;
             this.RB_模式1.Text = "模式1";
             this.RB_模式1.UseVisualStyleBackColor = true;
-            // 
-            // BTN_初始化
-            // 
-            this.BTN_初始化.Location = new System.Drawing.Point(376, 214);
-            this.BTN_初始化.Name = "BTN_初始化";
-            this.BTN_初始化.Size = new System.Drawing.Size(75, 23);
-            this.BTN_初始化.TabIndex = 5;
-            this.BTN_初始化.Text = "初始化";
-            this.BTN_初始化.UseVisualStyleBackColor = true;
-            this.BTN_初始化.Click += new System.EventHandler(this.BTN_初始化_Click);
             // 
             // BTN_自动停止
             // 
@@ -315,31 +317,13 @@
             // 
             // GB_手动
             // 
-            this.GB_手动.Controls.Add(this.TB_X相对位移量);
-            this.GB_手动.Controls.Add(this.label19);
+            this.GB_手动.Controls.Add(this.BTN_回原点);
             this.GB_手动.Location = new System.Drawing.Point(420, 6);
             this.GB_手动.Name = "GB_手动";
             this.GB_手动.Size = new System.Drawing.Size(200, 159);
             this.GB_手动.TabIndex = 2;
             this.GB_手动.TabStop = false;
             this.GB_手动.Text = "手动";
-            // 
-            // TB_X相对位移量
-            // 
-            this.TB_X相对位移量.Location = new System.Drawing.Point(71, 14);
-            this.TB_X相对位移量.Name = "TB_X相对位移量";
-            this.TB_X相对位移量.Size = new System.Drawing.Size(57, 21);
-            this.TB_X相对位移量.TabIndex = 1;
-            this.TB_X相对位移量.Text = "0";
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(6, 17);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(59, 12);
-            this.label19.TabIndex = 0;
-            this.label19.Text = "X轴相位移";
             // 
             // GB_Y
             // 
@@ -551,10 +535,11 @@
             // 
             // TP_设置
             // 
+            this.TP_设置.Controls.Add(this.BTN_设置);
+            this.TP_设置.Controls.Add(this.TB_IP);
+            this.TP_设置.Controls.Add(this.LB_IP);
             this.TP_设置.Controls.Add(this.BTN_保存设置);
             this.TP_设置.Controls.Add(this.GB_切割设置);
-            this.TP_设置.Controls.Add(this.TB_AxisType);
-            this.TP_设置.Controls.Add(this.label9);
             this.TP_设置.Controls.Add(this.GB_Y轴设置);
             this.TP_设置.Controls.Add(this.GB_X轴设置);
             this.TP_设置.Location = new System.Drawing.Point(4, 22);
@@ -563,6 +548,23 @@
             this.TP_设置.TabIndex = 2;
             this.TP_设置.Text = "设置";
             this.TP_设置.UseVisualStyleBackColor = true;
+            // 
+            // TB_IP
+            // 
+            this.TB_IP.Location = new System.Drawing.Point(37, 226);
+            this.TB_IP.Name = "TB_IP";
+            this.TB_IP.Size = new System.Drawing.Size(100, 21);
+            this.TB_IP.TabIndex = 7;
+            this.TB_IP.Text = "127.0.0.1";
+            // 
+            // LB_IP
+            // 
+            this.LB_IP.AutoSize = true;
+            this.LB_IP.Location = new System.Drawing.Point(14, 229);
+            this.LB_IP.Name = "LB_IP";
+            this.LB_IP.Size = new System.Drawing.Size(17, 12);
+            this.LB_IP.TabIndex = 6;
+            this.LB_IP.Text = "IP";
             // 
             // BTN_保存设置
             // 
@@ -597,6 +599,23 @@
             this.GB_切割设置.TabIndex = 4;
             this.GB_切割设置.TabStop = false;
             this.GB_切割设置.Text = "切割设置";
+            // 
+            // TB_LaserSignal
+            // 
+            this.TB_LaserSignal.Location = new System.Drawing.Point(212, 41);
+            this.TB_LaserSignal.Name = "TB_LaserSignal";
+            this.TB_LaserSignal.Size = new System.Drawing.Size(40, 21);
+            this.TB_LaserSignal.TabIndex = 25;
+            this.TB_LaserSignal.Text = "6";
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(135, 45);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(53, 12);
+            this.label26.TabIndex = 24;
+            this.label26.Text = "激光信号";
             // 
             // TB_终止位置
             // 
@@ -700,18 +719,18 @@
             this.label10.TabIndex = 12;
             this.label10.Text = "起始位置(X)";
             // 
-            // TB_AxisType
+            // TB_XAxisType
             // 
-            this.TB_AxisType.Location = new System.Drawing.Point(436, 265);
-            this.TB_AxisType.Name = "TB_AxisType";
-            this.TB_AxisType.Size = new System.Drawing.Size(50, 21);
-            this.TB_AxisType.TabIndex = 3;
-            this.TB_AxisType.Text = "1";
+            this.TB_XAxisType.Location = new System.Drawing.Point(186, 151);
+            this.TB_XAxisType.Name = "TB_XAxisType";
+            this.TB_XAxisType.Size = new System.Drawing.Size(51, 21);
+            this.TB_XAxisType.TabIndex = 3;
+            this.TB_XAxisType.Text = "1";
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(389, 268);
+            this.label9.Location = new System.Drawing.Point(121, 154);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(41, 12);
             this.label9.TabIndex = 2;
@@ -719,7 +738,9 @@
             // 
             // GB_Y轴设置
             // 
+            this.GB_Y轴设置.Controls.Add(this.TB_YAxisType);
             this.GB_Y轴设置.Controls.Add(this.TB_YCreepSpeed);
+            this.GB_Y轴设置.Controls.Add(this.label29);
             this.GB_Y轴设置.Controls.Add(this.label28);
             this.GB_Y轴设置.Controls.Add(this.TB_Y负软限位);
             this.GB_Y轴设置.Controls.Add(this.TB_Y正软限位);
@@ -747,6 +768,23 @@
             this.GB_Y轴设置.TabIndex = 1;
             this.GB_Y轴设置.TabStop = false;
             this.GB_Y轴设置.Text = "Y轴设置";
+            // 
+            // TB_YCreepSpeed
+            // 
+            this.TB_YCreepSpeed.Location = new System.Drawing.Point(65, 151);
+            this.TB_YCreepSpeed.Name = "TB_YCreepSpeed";
+            this.TB_YCreepSpeed.Size = new System.Drawing.Size(50, 21);
+            this.TB_YCreepSpeed.TabIndex = 30;
+            this.TB_YCreepSpeed.Text = "10";
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(6, 154);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(53, 12);
+            this.label28.TabIndex = 29;
+            this.label28.Text = "爬行速度";
             // 
             // TB_Y负软限位
             // 
@@ -818,7 +856,7 @@
             // 
             // TB_Y原点信号
             // 
-            this.TB_Y原点信号.Location = new System.Drawing.Point(189, 14);
+            this.TB_Y原点信号.Location = new System.Drawing.Point(187, 15);
             this.TB_Y原点信号.Name = "TB_Y原点信号";
             this.TB_Y原点信号.Size = new System.Drawing.Size(50, 21);
             this.TB_Y原点信号.TabIndex = 20;
@@ -924,7 +962,9 @@
             this.GB_X轴设置.Controls.Add(this.label27);
             this.GB_X轴设置.Controls.Add(this.TB_X负软限位);
             this.GB_X轴设置.Controls.Add(this.TB_X正软限位);
+            this.GB_X轴设置.Controls.Add(this.TB_XAxisType);
             this.GB_X轴设置.Controls.Add(this.label22);
+            this.GB_X轴设置.Controls.Add(this.label9);
             this.GB_X轴设置.Controls.Add(this.label21);
             this.GB_X轴设置.Controls.Add(this.TB_X负限位信号);
             this.GB_X轴设置.Controls.Add(this.label15);
@@ -948,6 +988,23 @@
             this.GB_X轴设置.TabIndex = 0;
             this.GB_X轴设置.TabStop = false;
             this.GB_X轴设置.Text = "X轴设置";
+            // 
+            // TB_XCreepSpeed
+            // 
+            this.TB_XCreepSpeed.Location = new System.Drawing.Point(65, 151);
+            this.TB_XCreepSpeed.Name = "TB_XCreepSpeed";
+            this.TB_XCreepSpeed.Size = new System.Drawing.Size(50, 21);
+            this.TB_XCreepSpeed.TabIndex = 20;
+            this.TB_XCreepSpeed.Text = "10";
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(6, 154);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(53, 12);
+            this.label27.TabIndex = 19;
+            this.label27.Text = "爬行速度";
             // 
             // TB_X负软限位
             // 
@@ -1137,7 +1194,7 @@
             this.GB_零点校准.Controls.Add(this.BTN_位置清零);
             this.GB_零点校准.Controls.Add(this.TB_AxisCode);
             this.GB_零点校准.Controls.Add(this.label18);
-            this.GB_零点校准.Location = new System.Drawing.Point(8, 14);
+            this.GB_零点校准.Location = new System.Drawing.Point(8, 12);
             this.GB_零点校准.Name = "GB_零点校准";
             this.GB_零点校准.Size = new System.Drawing.Size(211, 115);
             this.GB_零点校准.TabIndex = 0;
@@ -1203,66 +1260,43 @@
             this.label18.TabIndex = 0;
             this.label18.Text = "轴号";
             // 
-            // label26
+            // TB_YAxisType
             // 
-            this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(135, 45);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(53, 12);
-            this.label26.TabIndex = 24;
-            this.label26.Text = "激光信号";
+            this.TB_YAxisType.Location = new System.Drawing.Point(186, 151);
+            this.TB_YAxisType.Name = "TB_YAxisType";
+            this.TB_YAxisType.Size = new System.Drawing.Size(51, 21);
+            this.TB_YAxisType.TabIndex = 9;
+            this.TB_YAxisType.Text = "1";
             // 
-            // TB_LaserSignal
+            // label29
             // 
-            this.TB_LaserSignal.Location = new System.Drawing.Point(212, 41);
-            this.TB_LaserSignal.Name = "TB_LaserSignal";
-            this.TB_LaserSignal.Size = new System.Drawing.Size(40, 21);
-            this.TB_LaserSignal.TabIndex = 25;
-            this.TB_LaserSignal.Text = "6";
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(121, 154);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(41, 12);
+            this.label29.TabIndex = 8;
+            this.label29.Text = "轴类型";
             // 
-            // BTN_停止
+            // BTN_设置
             // 
-            this.BTN_停止.Location = new System.Drawing.Point(474, 214);
-            this.BTN_停止.Name = "BTN_停止";
-            this.BTN_停止.Size = new System.Drawing.Size(75, 23);
-            this.BTN_停止.TabIndex = 7;
-            this.BTN_停止.Text = "全部停止";
-            this.BTN_停止.UseVisualStyleBackColor = true;
-            this.BTN_停止.Click += new System.EventHandler(this.BTN_停止_Click);
+            this.BTN_设置.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.BTN_设置.Location = new System.Drawing.Point(628, 393);
+            this.BTN_设置.Name = "BTN_设置";
+            this.BTN_设置.Size = new System.Drawing.Size(75, 23);
+            this.BTN_设置.TabIndex = 8;
+            this.BTN_设置.Text = "设置";
+            this.BTN_设置.UseVisualStyleBackColor = true;
+            this.BTN_设置.Click += new System.EventHandler(this.BTN_设置_Click);
             // 
-            // TB_XCreepSpeed
+            // BTN_回原点
             // 
-            this.TB_XCreepSpeed.Location = new System.Drawing.Point(65, 151);
-            this.TB_XCreepSpeed.Name = "TB_XCreepSpeed";
-            this.TB_XCreepSpeed.Size = new System.Drawing.Size(50, 21);
-            this.TB_XCreepSpeed.TabIndex = 20;
-            this.TB_XCreepSpeed.Text = "10";
-            // 
-            // label27
-            // 
-            this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(6, 154);
-            this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(53, 12);
-            this.label27.TabIndex = 19;
-            this.label27.Text = "爬行速度";
-            // 
-            // TB_YCreepSpeed
-            // 
-            this.TB_YCreepSpeed.Location = new System.Drawing.Point(65, 151);
-            this.TB_YCreepSpeed.Name = "TB_YCreepSpeed";
-            this.TB_YCreepSpeed.Size = new System.Drawing.Size(50, 21);
-            this.TB_YCreepSpeed.TabIndex = 30;
-            this.TB_YCreepSpeed.Text = "10";
-            // 
-            // label28
-            // 
-            this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(6, 154);
-            this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(53, 12);
-            this.label28.TabIndex = 29;
-            this.label28.Text = "爬行速度";
+            this.BTN_回原点.Location = new System.Drawing.Point(6, 20);
+            this.BTN_回原点.Name = "BTN_回原点";
+            this.BTN_回原点.Size = new System.Drawing.Size(75, 23);
+            this.BTN_回原点.TabIndex = 0;
+            this.BTN_回原点.Text = "回原点";
+            this.BTN_回原点.UseVisualStyleBackColor = true;
+            this.BTN_回原点.Click += new System.EventHandler(this.BTN_回原点_Click);
             // 
             // Form1
             // 
@@ -1281,7 +1315,6 @@
             this.TP_手动.ResumeLayout(false);
             this.TP_手动.PerformLayout();
             this.GB_手动.ResumeLayout(false);
-            this.GB_手动.PerformLayout();
             this.GB_Y.ResumeLayout(false);
             this.GB_Y.PerformLayout();
             this.GB_X.ResumeLayout(false);
@@ -1334,9 +1367,8 @@
         private System.Windows.Forms.TextBox TB_X运行速度;
         private System.Windows.Forms.TextBox TB_X脉冲当量;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button BTN_初始化;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.TextBox TB_AxisType;
+        private System.Windows.Forms.TextBox TB_XAxisType;
         private System.Windows.Forms.GroupBox GB_Y;
         private System.Windows.Forms.GroupBox GB_X;
         private System.Windows.Forms.Button BTN_Y回原点;
@@ -1370,8 +1402,6 @@
         private System.Windows.Forms.Button BTN_校准停止;
         private System.Windows.Forms.CheckBox CB_回零方向;
         private System.Windows.Forms.GroupBox GB_手动;
-        private System.Windows.Forms.TextBox TB_X相对位移量;
-        private System.Windows.Forms.Label label19;
         private System.Windows.Forms.Label LB_激光关闭位置;
         private System.Windows.Forms.Label LB_激光开启位置;
         private System.Windows.Forms.TextBox TB_LaserOffPos;
@@ -1415,6 +1445,12 @@
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.TextBox TB_YCreepSpeed;
         private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.TextBox TB_IP;
+        private System.Windows.Forms.Label LB_IP;
+        private System.Windows.Forms.TextBox TB_YAxisType;
+        private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.Button BTN_设置;
+        private System.Windows.Forms.Button BTN_回原点;
     }
 }
 

@@ -12,10 +12,10 @@ namespace ZmotionDemo
 
         public MotionControlCard() { }
 
-        public bool Connect()
+        public bool Connect(string ip = "127.0.0.1")
         {
             //链接控制器 
-            Zmcaux.ZAux_OpenEth("127.0.0.1", out G_handle);
+            Zmcaux.ZAux_OpenEth(ip, out G_handle);
             if (G_handle != (IntPtr)0)
                 return true;
             else
