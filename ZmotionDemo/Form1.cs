@@ -12,6 +12,8 @@ namespace ZmotionDemo
         readonly MotionControlCard card = new MotionControlCard();
         private bool isAuto = false;
         private bool isLaserWork = false;
+        private readonly float unitsX;
+        private readonly float unitsY;
 
         public Form1()
         {
@@ -22,6 +24,10 @@ namespace ZmotionDemo
                 if (card.Connect(TB_IP.Text))
                 {
                     MessageBox.Show("控制器链接成功!", "提示");
+                    if (!float.TryParse(TB_X脉冲当量.Text, out unitsX))
+                        MessageBox.Show("脉冲当量X读取失败。", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    if (!float.TryParse(TB_Y脉冲当量.Text, out unitsY))
+                        MessageBox.Show("脉冲当量Y读取失败。", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     InitializeAxes();
                     Task.Run(UpdateCardStatus);
                     card.Axes[1].MovingAction += YAxisMoving;
@@ -73,16 +79,20 @@ namespace ZmotionDemo
 
         public void InitializeAxes()
         {
-            card.AddAxis(int.Parse(TB_XAxisType.Text), 0);
-            card.AddAxis(int.Parse(TB_YAxisType.Text), 1);
-            card.Axes[0].Initialize(TB_X脉冲当量.Text, TB_X运行速度.Text, TB_X加速度.Text, TB_X减速度.Text, TB_XS曲线.Text, TB_XCreepSpeed.Text);
-            card.Axes[1].Initialize(TB_Y脉冲当量.Text, TB_Y运行速度.Text, TB_Y加速度.Text, TB_Y减速度.Text, TB_YS曲线.Text, TB_YCreepSpeed.Text);
+            card.AddAxis(int.Parse(TB_XAxisType.Text), 0, unitsX);
+            card.AddAxis(int.Parse(TB_YAxisType.Text), 1, unitsY);
+            //card.Axes[0].Initialize(TB_X脉冲当量.Text, TB_X运行速度.Text, TB_X加速度.Text, TB_X减速度.Text, TB_XS曲线.Text, TB_XCreepSpeed.Text);
+            card.Axes[0].Initialize(GetFloat(TB_X运行速度.Text), GetFloat(TB_X加速度.Text), GetFloat(TB_X减速度.Text), GetFloat(TB_XS曲线.Text), GetFloat(TB_XCreepSpeed.Text));
+            //card.Axes[1].Initialize(TB_Y脉冲当量.Text, TB_Y运行速度.Text, TB_Y加速度.Text, TB_Y减速度.Text, TB_YS曲线.Text, TB_YCreepSpeed.Text);
+            card.Axes[1].Initialize(GetFloat(TB_Y运行速度.Text), GetFloat(TB_Y加速度.Text), GetFloat(TB_Y减速度.Text), GetFloat(TB_YS曲线.Text), GetFloat(TB_YCreepSpeed.Text));
             card.Axes[0].InitializeDatum(int.Parse(TB_X原点信号.Text));
             card.Axes[1].InitializeDatum(int.Parse(TB_Y原点信号.Text));
             card.Axes[0].SetLimitSignal(int.Parse(TB_X正限位信号.Text), int.Parse(TB_X负限位信号.Text));
             card.Axes[1].SetLimitSignal(int.Parse(TB_Y正限位信号.Text), int.Parse(TB_Y负限位信号.Text));
-            card.Axes[0].SetLimit(float.Parse(TB_X正软限位.Text), float.Parse(TB_X负软限位.Text));
-            card.Axes[1].SetLimit(float.Parse(TB_Y正软限位.Text), float.Parse(TB_Y负软限位.Text));
+            //card.Axes[0].SetLimit(float.Parse(TB_X正软限位.Text), float.Parse(TB_X负软限位.Text));
+            card.Axes[0].SetLimit(GetFloat(TB_X正软限位.Text), GetFloat(TB_X负软限位.Text));
+            //card.Axes[1].SetLimit(float.Parse(TB_Y正软限位.Text), float.Parse(TB_Y负软限位.Text));
+            card.Axes[1].SetLimit(GetFloat(TB_Y正软限位.Text), GetFloat(TB_Y负软限位.Text));
         }
 
         public void LoadConfig()
@@ -173,7 +183,7 @@ namespace ZmotionDemo
 
         private void AutoRun(bool cancel)
         {
-            
+            isLaserWork = false;
             if (card.Axes[0].IsMoving)
             {
                 MessageBox.Show("X轴运动中");
@@ -255,7 +265,7 @@ namespace ZmotionDemo
                     card.Axes[1].Wait();
                     card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
                     card.Axes[0].Wait();
-
+                    isLaserWork = false;
                     card.Axes[1].Direction = -1;
                     card.Axes[1].AbsoluteMove(0);
                     card.Axes[1].Wait();
@@ -294,7 +304,7 @@ namespace ZmotionDemo
                                 //关激光
                                 card.SetOutput(laserSignal, 0);
                             }
-                            if (position < laserOffPos)
+                            if (position < laserOffPos && position > laserOnPos)
                             {
                                 //开激光
                                 card.SetOutput(laserSignal, 1);
@@ -341,14 +351,22 @@ namespace ZmotionDemo
                 item.Stop();
             }
         }
+
+        private float GetFloat(string value)
+        {
+            if (float.TryParse(value, out var pulse))
+                return pulse;
+            else
+                return 0;
+        }
         #endregion
 
         private void BTN_设置_Click(object sender, EventArgs e)
         {
             try
             {
-                card.Axes[0].Initialize(TB_X脉冲当量.Text, TB_X运行速度.Text, TB_X加速度.Text, TB_X减速度.Text, TB_XS曲线.Text, TB_XCreepSpeed.Text);
-                card.Axes[1].Initialize(TB_Y脉冲当量.Text, TB_Y运行速度.Text, TB_Y加速度.Text, TB_Y减速度.Text, TB_YS曲线.Text, TB_YCreepSpeed.Text);
+                card.Axes[0].Initialize(TB_X运行速度.Text, TB_X加速度.Text, TB_X减速度.Text, TB_XS曲线.Text, TB_XCreepSpeed.Text);
+                card.Axes[1].Initialize(TB_Y运行速度.Text, TB_Y加速度.Text, TB_Y减速度.Text, TB_YS曲线.Text, TB_YCreepSpeed.Text);
                 card.Axes[0].InitializeDatum(int.Parse(TB_X原点信号.Text));
                 card.Axes[1].InitializeDatum(int.Parse(TB_Y原点信号.Text));
                 card.Axes[0].SetLimitSignal(int.Parse(TB_X正限位信号.Text), int.Parse(TB_X负限位信号.Text));
@@ -579,7 +597,6 @@ namespace ZmotionDemo
             {
                 MessageBox.Show("运行失败。" + ex.Message, "手动控制");
             }
-            
         }
 
         private void BTN_X绝对运动_Click(object sender, EventArgs e)
@@ -593,7 +610,6 @@ namespace ZmotionDemo
             {
                 MessageBox.Show("运行失败。" + ex.Message, "手动控制");
             }
-            
         }
 
         private void BTN_X左_Click(object sender, EventArgs e)
@@ -607,7 +623,6 @@ namespace ZmotionDemo
             {
                 MessageBox.Show("运行失败。" + ex.Message, "手动控制");
             }
-            
         }
 
         private void BTN_XStop_Click(object sender, EventArgs e)
@@ -706,31 +721,73 @@ namespace ZmotionDemo
             try
             {
                 isLaserWork = false;
-                if (card.Axes[0].IsMoving)
-                {
-                    MessageBox.Show("X轴运动中");
-                }
-                else
-                {
-                    card.Axes[0].Home();
-                }
-                if (card.Axes[1].IsMoving)
-                {
-                    MessageBox.Show("Y轴运动中");
-                }
-                else
-                {
-                    card.Axes[1].Home();
-                }
+                card.Axes[0].Direction = 1;
+                card.Axes[1].Direction = 1;
+                card.Axes[0].Home();
+                card.Axes[1].Home();
+                card.Axes[0].Wait();
+                card.Axes[1].Wait();
+                
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("回原点失败");
+            }
+        }
+
+        private void BTN_手动运行_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                isLaserWork = true;
+                card.Axes[1].Direction = 1;
+                card.Axes[1].AbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
+                card.Axes[1].Wait();
+                card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
+                card.Axes[0].Wait();
+                isLaserWork = false;
+                card.Axes[1].Direction = -1;
+                card.Axes[1].AbsoluteMove(0);
+                card.Axes[1].Wait();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("运行失败");
+            }
+        }
+
+        private void BTN_手动X轴移动_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
+                card.Axes[0].Wait();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("运行失败");
+            }
+        }
+
+        private void BTN_手动初始位置_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                isLaserWork = false;
+                card.Axes[0].Direction = 1;
+                card.Axes[1].Direction = 1;
+                card.Axes[0].Home();
+                card.Axes[1].Home();
+                card.Axes[0].Wait();
+                card.Axes[1].Wait();
+                card.Axes[0].AbsoluteMove(Convert.ToSingle(TB_起始位置.Text));
+                card.Axes[0].Wait();
             }
             catch (Exception)
             {
                 MessageBox.Show("初始化失败");
             }
         }
-
-
-
         #endregion
 
 

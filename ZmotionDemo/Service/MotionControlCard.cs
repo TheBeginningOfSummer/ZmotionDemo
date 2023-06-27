@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ZmotionDemo
 {
@@ -28,9 +29,9 @@ namespace ZmotionDemo
             Zmcaux.ZAux_Close(G_handle);
         }
 
-        public void AddAxis(int type, int number)
+        public void AddAxis(int type, int number, float units)
         {
-            Axes.Add(new Axis(type, number, G_handle));
+            Axes.Add(new Axis(type, number, units, G_handle));
         }
 
         public void SetOutput(int num, uint value)
@@ -57,8 +58,10 @@ namespace ZmotionDemo
     {
         public int AxisType { get; set; }
         public int AxisNumber { get; set; }
+        public float AxisUnits { get; private set; }
         public IntPtr Handle { get; private set; }
         public int Direction { get; set; } = 1;
+
         private bool isMoving = false;
         public bool IsMoving
         {
@@ -76,31 +79,51 @@ namespace ZmotionDemo
         public float CurrentPosition;
         public Action<float> MovingAction;
 
-        public Axis(int type, int number, IntPtr handle)
+        public Axis(int type, int number, float units, IntPtr handle)
         {
             AxisType = type;
             AxisNumber = number;
+            AxisUnits = units;
             Handle = handle;
             Zmcaux.ZAux_Direct_SetAtype(Handle, AxisNumber, AxisType);
         }
 
         #region 初始化
         /// <summary>
-        /// 初始化轴参数
+        /// 初始化轴参数string
         /// </summary>
-        /// <param name="arg">参数，依次为脉冲当量、速度、加速度、减速度、S曲线（选用 爬行速度、初始速度）</param>
+        /// <param name="arg">参数，依次为速度、加速度、减速度、S曲线（选用 爬行速度、初始速度）</param>
         public void Initialize(params string[] arg)
         {
-            if (arg == null || arg.Length < 5) return;
-            Zmcaux.ZAux_Direct_SetUnits(Handle, AxisNumber, Convert.ToSingle(arg[0]));
-            Zmcaux.ZAux_Direct_SetSpeed(Handle, AxisNumber, Convert.ToSingle(arg[1]));
-            Zmcaux.ZAux_Direct_SetAccel(Handle, AxisNumber, Convert.ToSingle(arg[2]));
-            Zmcaux.ZAux_Direct_SetDecel(Handle, AxisNumber, Convert.ToSingle(arg[3]));
-            Zmcaux.ZAux_Direct_SetSramp(Handle, AxisNumber, Convert.ToSingle(arg[4]));
+            if (arg == null || arg.Length < 4) return;
+            Zmcaux.ZAux_Direct_SetUnits(Handle, AxisNumber, AxisUnits);
+            Zmcaux.ZAux_Direct_SetSpeed(Handle, AxisNumber, Convert.ToSingle(arg[0]) * AxisUnits);
+            Zmcaux.ZAux_Direct_SetAccel(Handle, AxisNumber, Convert.ToSingle(arg[1]) * AxisUnits);
+            Zmcaux.ZAux_Direct_SetDecel(Handle, AxisNumber, Convert.ToSingle(arg[2]) * AxisUnits);
+            Zmcaux.ZAux_Direct_SetSramp(Handle, AxisNumber, Convert.ToSingle(arg[3]) * AxisUnits);
+            if (arg.Length > 4)
+                Zmcaux.ZAux_Direct_SetCreep(Handle, AxisNumber, Convert.ToSingle(arg[4]) * AxisUnits);
             if (arg.Length > 5)
-                Zmcaux.ZAux_Direct_SetCreep(Handle, AxisNumber, Convert.ToSingle(arg[5]));
-            if (arg.Length > 6)
-                Zmcaux.ZAux_Direct_SetLspeed(Handle, AxisNumber, Convert.ToSingle(arg[6]));
+                Zmcaux.ZAux_Direct_SetLspeed(Handle, AxisNumber, Convert.ToSingle(arg[5]) * AxisUnits);
+            Task.Run(UpdateStatus);
+        }
+        /// <summary>
+        /// 初始化轴参数float
+        /// </summary>
+        /// <param name="arg">参数，依次为速度、加速度、减速度、S曲线（选用 爬行速度、初始速度）</param>
+        public void Initialize(params float[] arg)
+        {
+            if (arg == null || arg.Length < 4) return;
+            Zmcaux.ZAux_Direct_SetUnits(Handle, AxisNumber, AxisUnits);
+            Zmcaux.ZAux_Direct_SetSpeed(Handle, AxisNumber, arg[0] * AxisUnits);
+            Zmcaux.ZAux_Direct_SetAccel(Handle, AxisNumber, arg[1] * AxisUnits);
+            Zmcaux.ZAux_Direct_SetDecel(Handle, AxisNumber, arg[2] * AxisUnits);
+            Zmcaux.ZAux_Direct_SetSramp(Handle, AxisNumber, arg[3] * AxisUnits);
+            if (arg.Length > 4)
+                Zmcaux.ZAux_Direct_SetCreep(Handle, AxisNumber, arg[4] * AxisUnits);
+            if (arg.Length > 5)
+                Zmcaux.ZAux_Direct_SetLspeed(Handle, AxisNumber, arg[5] * AxisUnits);
+            Task.Run(UpdateStatus);
         }
         /// <summary>
         /// 设置原点信号
@@ -133,9 +156,9 @@ namespace ZmotionDemo
         public void SetLimit(float forward = -1, float reverse = -1)
         {
             if (forward >= 0)
-                Zmcaux.ZAux_Direct_SetFsLimit(Handle, AxisNumber, forward);
+                Zmcaux.ZAux_Direct_SetFsLimit(Handle, AxisNumber, forward * AxisUnits);
             if (reverse >= 0)
-                Zmcaux.ZAux_Direct_SetRsLimit(Handle, AxisNumber, reverse);
+                Zmcaux.ZAux_Direct_SetRsLimit(Handle, AxisNumber, reverse * AxisUnits);
         }
         #endregion
 
@@ -155,9 +178,6 @@ namespace ZmotionDemo
         /// <returns></returns>
         public int Home()
         {
-            //int status = 0;
-            //Zmcaux.ZAux_Direct_GetIfIdle(Handle, AxisNumber, ref status);
-            //if (status == 0) return 0;
             if (CurrentPosition > 0)
             {
                 return Zmcaux.ZAux_Direct_Single_Datum(Handle, AxisNumber, 4);
@@ -182,7 +202,7 @@ namespace ZmotionDemo
         /// <returns></returns>
         public int RelativeMove(float distance)
         {
-            return Zmcaux.ZAux_Direct_Single_Move(Handle, AxisNumber, distance);
+            return Zmcaux.ZAux_Direct_Single_Move(Handle, AxisNumber, distance * AxisUnits);
         }
         /// <summary>
         /// 绝对运动
@@ -191,7 +211,7 @@ namespace ZmotionDemo
         /// <returns></returns>
         public int AbsoluteMove(float distance)
         {
-            return Zmcaux.ZAux_Direct_Single_MoveAbs(Handle, AxisNumber, distance);
+            return Zmcaux.ZAux_Direct_Single_MoveAbs(Handle, AxisNumber, distance * AxisUnits);
         }
         /// <summary>
         /// 停止运动
@@ -239,14 +259,14 @@ namespace ZmotionDemo
         {
             float speed = 0;
             Zmcaux.ZAux_Direct_GetSpeed(Handle, AxisNumber, ref speed);
-            return speed;
+            return speed / AxisUnits;
         }
 
         public float GetMSpeed()
         {
             float speed = 0;
             Zmcaux.ZAux_Direct_GetMspeed(Handle, AxisNumber, ref speed);
-            return speed;
+            return speed / AxisUnits;
         }
         /// <summary>
         /// 得到坐标
@@ -256,7 +276,7 @@ namespace ZmotionDemo
         {
             float position = 0;
             Zmcaux.ZAux_Direct_GetDpos(Handle, AxisNumber, ref position);
-            return position;
+            return position / AxisUnits;
         }
         /// <summary>
         /// 更新轴状态
@@ -264,6 +284,7 @@ namespace ZmotionDemo
         public void UpdateStatus()
         {
             int movingStatus = 0;
+            float position = 0;
             while (true)
             {
                 Thread.Sleep(100);
@@ -274,7 +295,8 @@ namespace ZmotionDemo
                     IsMoving = false;
                 if (IsMoving)
                 {
-                    Zmcaux.ZAux_Direct_GetDpos(Handle, AxisNumber, ref CurrentPosition);
+                    Zmcaux.ZAux_Direct_GetDpos(Handle, AxisNumber, ref position);
+                    CurrentPosition = position / AxisUnits;
                     MovingAction?.Invoke(CurrentPosition);
                 }
             }

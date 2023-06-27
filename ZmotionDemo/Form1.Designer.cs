@@ -43,6 +43,7 @@
             this.LB_YSpeed = new System.Windows.Forms.Label();
             this.LB_XSpeed = new System.Windows.Forms.Label();
             this.GB_手动 = new System.Windows.Forms.GroupBox();
+            this.BTN_回原点 = new System.Windows.Forms.Button();
             this.GB_Y = new System.Windows.Forms.GroupBox();
             this.BTN_Y右 = new System.Windows.Forms.Button();
             this.LB_当前Y轴位置 = new System.Windows.Forms.Label();
@@ -64,6 +65,7 @@
             this.LB_当前X轴位置 = new System.Windows.Forms.Label();
             this.BTN_X回原点 = new System.Windows.Forms.Button();
             this.TP_设置 = new System.Windows.Forms.TabPage();
+            this.BTN_设置 = new System.Windows.Forms.Button();
             this.TB_IP = new System.Windows.Forms.TextBox();
             this.LB_IP = new System.Windows.Forms.Label();
             this.BTN_保存设置 = new System.Windows.Forms.Button();
@@ -82,10 +84,10 @@
             this.label11 = new System.Windows.Forms.Label();
             this.TB_起始位置 = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.TB_XAxisType = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
             this.GB_Y轴设置 = new System.Windows.Forms.GroupBox();
+            this.TB_YAxisType = new System.Windows.Forms.TextBox();
             this.TB_YCreepSpeed = new System.Windows.Forms.TextBox();
+            this.label29 = new System.Windows.Forms.Label();
             this.label28 = new System.Windows.Forms.Label();
             this.TB_Y负软限位 = new System.Windows.Forms.TextBox();
             this.TB_Y正软限位 = new System.Windows.Forms.TextBox();
@@ -112,7 +114,9 @@
             this.label27 = new System.Windows.Forms.Label();
             this.TB_X负软限位 = new System.Windows.Forms.TextBox();
             this.TB_X正软限位 = new System.Windows.Forms.TextBox();
+            this.TB_XAxisType = new System.Windows.Forms.TextBox();
             this.label22 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.TB_X负限位信号 = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
@@ -139,10 +143,9 @@
             this.TB_AxisCode = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.BGW_Auto = new System.ComponentModel.BackgroundWorker();
-            this.TB_YAxisType = new System.Windows.Forms.TextBox();
-            this.label29 = new System.Windows.Forms.Label();
-            this.BTN_设置 = new System.Windows.Forms.Button();
-            this.BTN_回原点 = new System.Windows.Forms.Button();
+            this.BTN_手动运行 = new System.Windows.Forms.Button();
+            this.BTN_手动X轴移动 = new System.Windows.Forms.Button();
+            this.BTN_手动初始位置 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.TP_自动.SuspendLayout();
             this.GB_模式选择.SuspendLayout();
@@ -317,13 +320,26 @@
             // 
             // GB_手动
             // 
+            this.GB_手动.Controls.Add(this.BTN_手动初始位置);
+            this.GB_手动.Controls.Add(this.BTN_手动X轴移动);
+            this.GB_手动.Controls.Add(this.BTN_手动运行);
             this.GB_手动.Controls.Add(this.BTN_回原点);
             this.GB_手动.Location = new System.Drawing.Point(420, 6);
             this.GB_手动.Name = "GB_手动";
-            this.GB_手动.Size = new System.Drawing.Size(200, 159);
+            this.GB_手动.Size = new System.Drawing.Size(170, 159);
             this.GB_手动.TabIndex = 2;
             this.GB_手动.TabStop = false;
             this.GB_手动.Text = "手动";
+            // 
+            // BTN_回原点
+            // 
+            this.BTN_回原点.Location = new System.Drawing.Point(6, 20);
+            this.BTN_回原点.Name = "BTN_回原点";
+            this.BTN_回原点.Size = new System.Drawing.Size(75, 23);
+            this.BTN_回原点.TabIndex = 0;
+            this.BTN_回原点.Text = "回原点";
+            this.BTN_回原点.UseVisualStyleBackColor = true;
+            this.BTN_回原点.Click += new System.EventHandler(this.BTN_回原点_Click);
             // 
             // GB_Y
             // 
@@ -549,6 +565,17 @@
             this.TP_设置.Text = "设置";
             this.TP_设置.UseVisualStyleBackColor = true;
             // 
+            // BTN_设置
+            // 
+            this.BTN_设置.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.BTN_设置.Location = new System.Drawing.Point(628, 393);
+            this.BTN_设置.Name = "BTN_设置";
+            this.BTN_设置.Size = new System.Drawing.Size(75, 23);
+            this.BTN_设置.TabIndex = 8;
+            this.BTN_设置.Text = "设置";
+            this.BTN_设置.UseVisualStyleBackColor = true;
+            this.BTN_设置.Click += new System.EventHandler(this.BTN_设置_Click);
+            // 
             // TB_IP
             // 
             this.TB_IP.Location = new System.Drawing.Point(37, 226);
@@ -657,7 +684,7 @@
             this.TB_LaserOffPos.Name = "TB_LaserOffPos";
             this.TB_LaserOffPos.Size = new System.Drawing.Size(40, 21);
             this.TB_LaserOffPos.TabIndex = 19;
-            this.TB_LaserOffPos.Text = "10";
+            this.TB_LaserOffPos.Text = "300";
             // 
             // TB_LaserOnPos
             // 
@@ -665,7 +692,7 @@
             this.TB_LaserOnPos.Name = "TB_LaserOnPos";
             this.TB_LaserOnPos.Size = new System.Drawing.Size(40, 21);
             this.TB_LaserOnPos.TabIndex = 18;
-            this.TB_LaserOnPos.Text = "10";
+            this.TB_LaserOnPos.Text = "50";
             // 
             // LB_激光关闭位置
             // 
@@ -719,23 +746,6 @@
             this.label10.TabIndex = 12;
             this.label10.Text = "起始位置(X)";
             // 
-            // TB_XAxisType
-            // 
-            this.TB_XAxisType.Location = new System.Drawing.Point(186, 151);
-            this.TB_XAxisType.Name = "TB_XAxisType";
-            this.TB_XAxisType.Size = new System.Drawing.Size(51, 21);
-            this.TB_XAxisType.TabIndex = 3;
-            this.TB_XAxisType.Text = "1";
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(121, 154);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(41, 12);
-            this.label9.TabIndex = 2;
-            this.label9.Text = "轴类型";
-            // 
             // GB_Y轴设置
             // 
             this.GB_Y轴设置.Controls.Add(this.TB_YAxisType);
@@ -769,6 +779,14 @@
             this.GB_Y轴设置.TabStop = false;
             this.GB_Y轴设置.Text = "Y轴设置";
             // 
+            // TB_YAxisType
+            // 
+            this.TB_YAxisType.Location = new System.Drawing.Point(186, 151);
+            this.TB_YAxisType.Name = "TB_YAxisType";
+            this.TB_YAxisType.Size = new System.Drawing.Size(51, 21);
+            this.TB_YAxisType.TabIndex = 9;
+            this.TB_YAxisType.Text = "1";
+            // 
             // TB_YCreepSpeed
             // 
             this.TB_YCreepSpeed.Location = new System.Drawing.Point(65, 151);
@@ -776,6 +794,15 @@
             this.TB_YCreepSpeed.Size = new System.Drawing.Size(50, 21);
             this.TB_YCreepSpeed.TabIndex = 30;
             this.TB_YCreepSpeed.Text = "10";
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(121, 154);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(41, 12);
+            this.label29.TabIndex = 8;
+            this.label29.Text = "轴类型";
             // 
             // label28
             // 
@@ -792,7 +819,7 @@
             this.TB_Y负软限位.Name = "TB_Y负软限位";
             this.TB_Y负软限位.Size = new System.Drawing.Size(51, 21);
             this.TB_Y负软限位.TabIndex = 28;
-            this.TB_Y负软限位.Text = "10";
+            this.TB_Y负软限位.Text = "-10";
             // 
             // TB_Y正软限位
             // 
@@ -1012,7 +1039,7 @@
             this.TB_X负软限位.Name = "TB_X负软限位";
             this.TB_X负软限位.Size = new System.Drawing.Size(51, 21);
             this.TB_X负软限位.TabIndex = 18;
-            this.TB_X负软限位.Text = "10";
+            this.TB_X负软限位.Text = "-10";
             // 
             // TB_X正软限位
             // 
@@ -1022,6 +1049,14 @@
             this.TB_X正软限位.TabIndex = 17;
             this.TB_X正软限位.Text = "1000";
             // 
+            // TB_XAxisType
+            // 
+            this.TB_XAxisType.Location = new System.Drawing.Point(186, 151);
+            this.TB_XAxisType.Name = "TB_XAxisType";
+            this.TB_XAxisType.Size = new System.Drawing.Size(51, 21);
+            this.TB_XAxisType.TabIndex = 3;
+            this.TB_XAxisType.Text = "1";
+            // 
             // label22
             // 
             this.label22.AutoSize = true;
@@ -1030,6 +1065,15 @@
             this.label22.Size = new System.Drawing.Size(53, 12);
             this.label22.TabIndex = 16;
             this.label22.Text = "负软限位";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(121, 154);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(41, 12);
+            this.label9.TabIndex = 2;
+            this.label9.Text = "轴类型";
             // 
             // label21
             // 
@@ -1260,43 +1304,35 @@
             this.label18.TabIndex = 0;
             this.label18.Text = "轴号";
             // 
-            // TB_YAxisType
+            // BTN_手动运行
             // 
-            this.TB_YAxisType.Location = new System.Drawing.Point(186, 151);
-            this.TB_YAxisType.Name = "TB_YAxisType";
-            this.TB_YAxisType.Size = new System.Drawing.Size(51, 21);
-            this.TB_YAxisType.TabIndex = 9;
-            this.TB_YAxisType.Text = "1";
+            this.BTN_手动运行.Location = new System.Drawing.Point(87, 49);
+            this.BTN_手动运行.Name = "BTN_手动运行";
+            this.BTN_手动运行.Size = new System.Drawing.Size(75, 23);
+            this.BTN_手动运行.TabIndex = 1;
+            this.BTN_手动运行.Text = "运行";
+            this.BTN_手动运行.UseVisualStyleBackColor = true;
+            this.BTN_手动运行.Click += new System.EventHandler(this.BTN_手动运行_Click);
             // 
-            // label29
+            // BTN_手动X轴移动
             // 
-            this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(121, 154);
-            this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(41, 12);
-            this.label29.TabIndex = 8;
-            this.label29.Text = "轴类型";
+            this.BTN_手动X轴移动.Location = new System.Drawing.Point(6, 49);
+            this.BTN_手动X轴移动.Name = "BTN_手动X轴移动";
+            this.BTN_手动X轴移动.Size = new System.Drawing.Size(75, 23);
+            this.BTN_手动X轴移动.TabIndex = 2;
+            this.BTN_手动X轴移动.Text = "X轴移动";
+            this.BTN_手动X轴移动.UseVisualStyleBackColor = true;
+            this.BTN_手动X轴移动.Click += new System.EventHandler(this.BTN_手动X轴移动_Click);
             // 
-            // BTN_设置
+            // BTN_手动初始位置
             // 
-            this.BTN_设置.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BTN_设置.Location = new System.Drawing.Point(628, 393);
-            this.BTN_设置.Name = "BTN_设置";
-            this.BTN_设置.Size = new System.Drawing.Size(75, 23);
-            this.BTN_设置.TabIndex = 8;
-            this.BTN_设置.Text = "设置";
-            this.BTN_设置.UseVisualStyleBackColor = true;
-            this.BTN_设置.Click += new System.EventHandler(this.BTN_设置_Click);
-            // 
-            // BTN_回原点
-            // 
-            this.BTN_回原点.Location = new System.Drawing.Point(6, 20);
-            this.BTN_回原点.Name = "BTN_回原点";
-            this.BTN_回原点.Size = new System.Drawing.Size(75, 23);
-            this.BTN_回原点.TabIndex = 0;
-            this.BTN_回原点.Text = "回原点";
-            this.BTN_回原点.UseVisualStyleBackColor = true;
-            this.BTN_回原点.Click += new System.EventHandler(this.BTN_回原点_Click);
+            this.BTN_手动初始位置.Location = new System.Drawing.Point(87, 20);
+            this.BTN_手动初始位置.Name = "BTN_手动初始位置";
+            this.BTN_手动初始位置.Size = new System.Drawing.Size(75, 23);
+            this.BTN_手动初始位置.TabIndex = 3;
+            this.BTN_手动初始位置.Text = "初始位置";
+            this.BTN_手动初始位置.UseVisualStyleBackColor = true;
+            this.BTN_手动初始位置.Click += new System.EventHandler(this.BTN_手动初始位置_Click);
             // 
             // Form1
             // 
@@ -1451,6 +1487,9 @@
         private System.Windows.Forms.Label label29;
         private System.Windows.Forms.Button BTN_设置;
         private System.Windows.Forms.Button BTN_回原点;
+        private System.Windows.Forms.Button BTN_手动运行;
+        private System.Windows.Forms.Button BTN_手动X轴移动;
+        private System.Windows.Forms.Button BTN_手动初始位置;
     }
 }
 
