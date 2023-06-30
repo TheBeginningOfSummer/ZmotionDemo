@@ -12,8 +12,6 @@ namespace ZmotionDemo
         readonly MotionControlCard card = new MotionControlCard();
         private bool isAuto = false;
         private bool isLaserWork = false;
-        private readonly float unitsX;
-        private readonly float unitsY;
 
         public Form1()
         {
@@ -24,11 +22,8 @@ namespace ZmotionDemo
                 if (card.Connect(TB_IP.Text))
                 {
                     MessageBox.Show("控制器链接成功!", "提示");
-                    if (!float.TryParse(TB_X脉冲当量.Text, out unitsX))
-                        MessageBox.Show("脉冲当量X读取失败。", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    if (!float.TryParse(TB_Y脉冲当量.Text, out unitsY))
-                        MessageBox.Show("脉冲当量Y读取失败。", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     InitializeAxes();
+                    InitializeAxesConfig();
                     Task.Run(UpdateCardStatus);
                     card.Axes[1].MovingAction += YAxisMoving;
                     BGW_Auto.DoWork += BGW_Auto_DoWork;
@@ -47,7 +42,7 @@ namespace ZmotionDemo
         private void BGW_Auto_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             isLaserWork = false;
-            card.SetOutput(int.Parse(TB_LaserSignal.Text), 0);
+            card.SetOutput(GetInt(TB_LaserSignal.Text), 0);
         }
 
         private void BGW_Auto_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
@@ -79,19 +74,19 @@ namespace ZmotionDemo
 
         public void InitializeAxes()
         {
-            card.AddAxis(int.Parse(TB_XAxisType.Text), 0, unitsX);
-            card.AddAxis(int.Parse(TB_YAxisType.Text), 1, unitsY);
-            //card.Axes[0].Initialize(TB_X脉冲当量.Text, TB_X运行速度.Text, TB_X加速度.Text, TB_X减速度.Text, TB_XS曲线.Text, TB_XCreepSpeed.Text);
-            card.Axes[0].Initialize(int.Parse(TB_XPulseType.Text), GetFloat(TB_X运行速度.Text), GetFloat(TB_X加速度.Text), GetFloat(TB_X减速度.Text), GetFloat(TB_XS曲线.Text), GetFloat(TB_XCreepSpeed.Text), GetFloat(TB_XFastDec.Text));
-            //card.Axes[1].Initialize(TB_Y脉冲当量.Text, TB_Y运行速度.Text, TB_Y加速度.Text, TB_Y减速度.Text, TB_YS曲线.Text, TB_YCreepSpeed.Text);
-            card.Axes[1].Initialize(int.Parse(TB_YPulseType.Text), GetFloat(TB_Y运行速度.Text), GetFloat(TB_Y加速度.Text), GetFloat(TB_Y减速度.Text), GetFloat(TB_YS曲线.Text), GetFloat(TB_YCreepSpeed.Text), GetFloat(TB_YFastDec.Text));
-            card.Axes[0].InitializeDatum(int.Parse(TB_X原点信号.Text));
-            card.Axes[1].InitializeDatum(int.Parse(TB_Y原点信号.Text));
-            card.Axes[0].SetLimitSignal(int.Parse(TB_X正限位信号.Text), int.Parse(TB_X负限位信号.Text));
-            card.Axes[1].SetLimitSignal(int.Parse(TB_Y正限位信号.Text), int.Parse(TB_Y负限位信号.Text));
-            //card.Axes[0].SetLimit(float.Parse(TB_X正软限位.Text), float.Parse(TB_X负软限位.Text));
+            card.AddAxis(GetInt(TB_XAxisType.Text, "X轴类型读取失败。"), 0, GetFloat(TB_X脉冲当量.Text, "脉冲当量X读取失败。"));
+            card.AddAxis(GetInt(TB_YAxisType.Text, "Y轴类型读取失败。"), 1, GetFloat(TB_Y脉冲当量.Text, "脉冲当量Y读取失败。"));
+        }
+
+        public void InitializeAxesConfig()
+        {
+            card.Axes[0].Initialize(GetInt(TB_XPulseType.Text), GetFloat(TB_X运行速度.Text), GetFloat(TB_X加速度.Text), GetFloat(TB_X减速度.Text), GetFloat(TB_XS曲线.Text), GetFloat(TB_XCreepSpeed.Text), GetFloat(TB_XFastDec.Text));
+            card.Axes[1].Initialize(GetInt(TB_YPulseType.Text), GetFloat(TB_Y运行速度.Text), GetFloat(TB_Y加速度.Text), GetFloat(TB_Y减速度.Text), GetFloat(TB_YS曲线.Text), GetFloat(TB_YCreepSpeed.Text), GetFloat(TB_YFastDec.Text));
+            card.Axes[0].InitializeDatum(GetInt(TB_X原点信号.Text, "X原点信号设置数据读取失败。"));
+            card.Axes[1].InitializeDatum(GetInt(TB_Y原点信号.Text, "Y原点信号设置数据读取失败。"));
+            card.Axes[0].SetLimitSignal(GetInt(TB_X正限位信号.Text), GetInt(TB_X负限位信号.Text));
+            card.Axes[1].SetLimitSignal(GetInt(TB_Y正限位信号.Text), GetInt(TB_Y负限位信号.Text));
             card.Axes[0].SetLimit(GetFloat(TB_X正软限位.Text), GetFloat(TB_X负软限位.Text));
-            //card.Axes[1].SetLimit(float.Parse(TB_Y正软限位.Text), float.Parse(TB_Y负软限位.Text));
             card.Axes[1].SetLimit(GetFloat(TB_Y正软限位.Text), GetFloat(TB_Y负软限位.Text));
         }
 
@@ -365,12 +360,28 @@ namespace ZmotionDemo
             }
         }
 
-        private float GetFloat(string value)
+        private float GetFloat(string stringValue, string message = "")
         {
-            if (float.TryParse(value, out var pulse))
-                return pulse;
+            if (float.TryParse(stringValue, out var value))
+                return value;
             else
+            {
+                if (message != "")
+                    MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return 0;
+            }
+        }
+
+        private int GetInt(string stringValue, string message = "")
+        {
+            if (int.TryParse(stringValue, out var value))
+                return value;
+            else
+            {
+                if (message != "")
+                    MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return 0;
+            }
         }
         #endregion
 
@@ -446,6 +457,7 @@ namespace ZmotionDemo
                 if (card.Connect(TB_IP.Text))
                 {
                     MessageBox.Show("控制器链接成功!", "提示");
+
                 }
             }
             catch (Exception ex)
@@ -816,15 +828,8 @@ namespace ZmotionDemo
         {
             try
             {
-                card.Axes[0].Initialize(int.Parse(TB_XPulseType.Text), TB_X运行速度.Text, TB_X加速度.Text, TB_X减速度.Text, TB_XS曲线.Text, TB_XCreepSpeed.Text, TB_XFastDec.Text);
-                card.Axes[1].Initialize(int.Parse(TB_YPulseType.Text), TB_Y运行速度.Text, TB_Y加速度.Text, TB_Y减速度.Text, TB_YS曲线.Text, TB_YCreepSpeed.Text, TB_YFastDec.Text);
-                card.Axes[0].InitializeDatum(int.Parse(TB_X原点信号.Text));
-                card.Axes[1].InitializeDatum(int.Parse(TB_Y原点信号.Text));
-                card.Axes[0].SetLimitSignal(int.Parse(TB_X正限位信号.Text), int.Parse(TB_X负限位信号.Text));
-                card.Axes[1].SetLimitSignal(int.Parse(TB_Y正限位信号.Text), int.Parse(TB_Y负限位信号.Text));
-                card.Axes[0].SetLimit(float.Parse(TB_X正软限位.Text), float.Parse(TB_X负软限位.Text));
-                card.Axes[1].SetLimit(float.Parse(TB_Y正软限位.Text), float.Parse(TB_Y负软限位.Text));
-                MessageBox.Show("设置成功。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                InitializeAxesConfig();
+                MessageBox.Show("设置完成。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
