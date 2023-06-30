@@ -52,7 +52,7 @@ namespace ZmotionDemo
 
         private void BGW_Auto_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            AutoRun(BGW_Auto.CancellationPending);
+            AutoRun();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -93,6 +93,18 @@ namespace ZmotionDemo
             card.Axes[0].SetLimit(GetFloat(TB_X正软限位.Text), GetFloat(TB_X负软限位.Text));
             //card.Axes[1].SetLimit(float.Parse(TB_Y正软限位.Text), float.Parse(TB_Y负软限位.Text));
             card.Axes[1].SetLimit(GetFloat(TB_Y正软限位.Text), GetFloat(TB_Y负软限位.Text));
+        }
+
+        private void UpdateCardStatus()
+        {
+            while (true)
+            {
+                Thread.Sleep(100);
+                OnThread(LB_当前X轴位置, new Action(() => LB_当前X轴位置.Text = $"当前位置：{card.Axes[0].CurrentPosition:f2}"));
+                OnThread(LB_当前Y轴位置, new Action(() => LB_当前Y轴位置.Text = $"当前位置：{card.Axes[1].CurrentPosition:f2}"));
+                OnThread(LB_XSpeed, new Action(() => LB_XSpeed.Text = $"X轴速度：{card.Axes[0].GetMSpeed():f2}"));
+                OnThread(LB_YSpeed, new Action(() => LB_YSpeed.Text = $"Y轴速度：{card.Axes[1].GetMSpeed():f2}"));
+            }
         }
 
         public void LoadConfig()
@@ -181,19 +193,7 @@ namespace ZmotionDemo
             config.Change("IP", TB_IP.Text);
         }
 
-        private void UpdateCardStatus()
-        {
-            while (true)
-            {
-                Thread.Sleep(100);
-                OnThread(LB_当前X轴位置, new Action(() => LB_当前X轴位置.Text = $"当前位置：{card.Axes[0].CurrentPosition:f2}"));
-                OnThread(LB_当前Y轴位置, new Action(() => LB_当前Y轴位置.Text = $"当前位置：{card.Axes[1].CurrentPosition:f2}"));
-                OnThread(LB_XSpeed, new Action(() => LB_XSpeed.Text = $"X轴速度：{card.Axes[0].GetMSpeed():f2}"));
-                OnThread(LB_YSpeed, new Action(() => LB_YSpeed.Text = $"Y轴速度：{card.Axes[1].GetMSpeed():f2}"));
-            }
-        }
-
-        private void AutoRun(bool cancel)
+        private void AutoRun()
         {
             isLaserWork = false;
             if (card.Axes[0].IsMoving)
@@ -557,6 +557,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 if (card.Axes[0].IsMoving)
                 {
                     MessageBox.Show("X轴运动中");
@@ -576,6 +577,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 if (card.Axes[1].IsMoving)
                 {
                     MessageBox.Show("Y轴运动中");
@@ -595,6 +597,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 if (float.TryParse(TB_X相对运动.Text, out var x))
                     card.Axes[0].RelativeMove(x);
             }
@@ -608,6 +611,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 if (float.TryParse(TB_X绝对运动.Text, out var x))
                     card.Axes[0].AbsoluteMove(x);
             }
@@ -621,6 +625,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 card.Axes[0].Direction = -1;
                 card.Axes[0].ContinuousMove();
             }
@@ -634,6 +639,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 card.Axes[0].Stop();
             }
             catch (Exception ex)
@@ -647,6 +653,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 card.Axes[0].Direction = 1;
                 card.Axes[0].ContinuousMove();
             }
@@ -661,6 +668,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 if (float.TryParse(TB_Y相对运动.Text, out var y))
                     card.Axes[1].RelativeMove(y);
             }
@@ -674,6 +682,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 if (float.TryParse(TB_Y绝对运动.Text, out var y))
                     card.Axes[1].AbsoluteMove(y);
             }
@@ -687,6 +696,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 card.Axes[1].Direction = -1;
                 card.Axes[1].ContinuousMove();
             }
@@ -700,6 +710,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 card.Axes[1].Stop();
             }
             catch (Exception ex)
@@ -712,6 +723,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 card.Axes[1].Direction = 1;
                 card.Axes[1].ContinuousMove();
             }
@@ -725,6 +737,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 isLaserWork = false;
                 card.Axes[0].Direction = 1;
                 card.Axes[1].Direction = 1;
@@ -744,6 +757,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 isLaserWork = true;
                 card.Axes[1].Direction = 1;
                 card.Axes[1].AbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
@@ -765,6 +779,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
                 card.Axes[0].Wait();
             }
@@ -778,6 +793,7 @@ namespace ZmotionDemo
         {
             try
             {
+                if (isAuto) { MessageBox.Show("自动运行模式。", "提示"); return; }
                 isLaserWork = false;
                 card.Axes[0].Direction = 1;
                 card.Axes[1].Direction = 1;
