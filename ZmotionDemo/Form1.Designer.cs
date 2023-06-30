@@ -203,6 +203,7 @@
             // 
             // BTN_断开
             // 
+            this.BTN_断开.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.BTN_断开.Location = new System.Drawing.Point(186, 304);
             this.BTN_断开.Name = "BTN_断开";
             this.BTN_断开.Size = new System.Drawing.Size(75, 23);
@@ -213,6 +214,7 @@
             // 
             // BTN_停止
             // 
+            this.BTN_停止.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.BTN_停止.Location = new System.Drawing.Point(666, 304);
             this.BTN_停止.Name = "BTN_停止";
             this.BTN_停止.Size = new System.Drawing.Size(75, 23);
@@ -257,6 +259,7 @@
             // 
             // BTN_自动停止
             // 
+            this.BTN_自动停止.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.BTN_自动停止.Location = new System.Drawing.Point(569, 304);
             this.BTN_自动停止.Name = "BTN_自动停止";
             this.BTN_自动停止.Size = new System.Drawing.Size(75, 23);
@@ -267,6 +270,7 @@
             // 
             // BTN_自动运行
             // 
+            this.BTN_自动运行.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.BTN_自动运行.Location = new System.Drawing.Point(474, 304);
             this.BTN_自动运行.Name = "BTN_自动运行";
             this.BTN_自动运行.Size = new System.Drawing.Size(75, 23);
@@ -277,6 +281,7 @@
             // 
             // BTN_手动模式
             // 
+            this.BTN_手动模式.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.BTN_手动模式.Location = new System.Drawing.Point(376, 304);
             this.BTN_手动模式.Name = "BTN_手动模式";
             this.BTN_手动模式.Size = new System.Drawing.Size(75, 23);
@@ -287,6 +292,7 @@
             // 
             // BTN_自动模式
             // 
+            this.BTN_自动模式.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.BTN_自动模式.Location = new System.Drawing.Point(279, 304);
             this.BTN_自动模式.Name = "BTN_自动模式";
             this.BTN_自动模式.Size = new System.Drawing.Size(75, 23);
@@ -297,6 +303,7 @@
             // 
             // BTN_连接
             // 
+            this.BTN_连接.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.BTN_连接.Location = new System.Drawing.Point(88, 304);
             this.BTN_连接.Name = "BTN_连接";
             this.BTN_连接.Size = new System.Drawing.Size(75, 23);

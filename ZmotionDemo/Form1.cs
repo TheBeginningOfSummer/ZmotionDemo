@@ -212,7 +212,7 @@ namespace ZmotionDemo
             card.Axes[1].Home();
             card.Axes[0].Wait();
             card.Axes[1].Wait();
-            if (cancel) return;
+            if (BGW_Auto.CancellationPending) return;
             
             if (!int.TryParse(TB_切割次数.Text, out int cutTimes))
             {
@@ -224,7 +224,7 @@ namespace ZmotionDemo
             {
                 card.Axes[0].AbsoluteMove(Convert.ToSingle(TB_起始位置.Text));
                 card.Axes[0].Wait();
-                if (cancel) return;
+                if (BGW_Auto.CancellationPending) return;
                 if (cutTimes % 2 != 0)
                 {
                     //int remainder = cutTimes % 2;
@@ -235,13 +235,13 @@ namespace ZmotionDemo
                         card.Axes[1].Wait();
                         card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
                         card.Axes[0].Wait();
-                        if (cancel) return;
+                        if (BGW_Auto.CancellationPending) return;
                         card.Axes[1].Direction = -1;
                         card.Axes[1].AbsoluteMove(0);
                         card.Axes[1].Wait();
                         card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
                         card.Axes[0].Wait();
-                        if (cancel) return;
+                        if (BGW_Auto.CancellationPending) return;
                     }
                     card.Axes[1].Direction = 1;
                     card.Axes[1].AbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
@@ -256,13 +256,13 @@ namespace ZmotionDemo
                         card.Axes[1].Wait();
                         card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
                         card.Axes[0].Wait();
-                        if (cancel) return;
+                        if (BGW_Auto.CancellationPending) return;
                         card.Axes[1].Direction = -1;
                         card.Axes[1].AbsoluteMove(0);
                         card.Axes[1].Wait();
                         card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
                         card.Axes[0].Wait();
-                        if (cancel) return;
+                        if (BGW_Auto.CancellationPending) return;
                     }
                 }
             }
@@ -282,7 +282,7 @@ namespace ZmotionDemo
                     card.Axes[1].Direction = -1;
                     card.Axes[1].AbsoluteMove(0);
                     card.Axes[1].Wait();
-                    if (cancel) return;
+                    if (BGW_Auto.CancellationPending) return;
                 }
             }
 
