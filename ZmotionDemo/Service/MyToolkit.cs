@@ -117,11 +117,11 @@ namespace ZmotionDemo
                 if (KeyValueList.ContainsKey(key))
                     return KeyValueList[key];
                 else
-                    return "";
+                    return "0";
             }
             catch (Exception)
             {
-                return "";
+                return "0";
             }
         }
     }

@@ -30,6 +30,7 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TP_自动 = new System.Windows.Forms.TabPage();
+            this.BTN_断开 = new System.Windows.Forms.Button();
             this.BTN_停止 = new System.Windows.Forms.Button();
             this.GB_模式选择 = new System.Windows.Forms.GroupBox();
             this.RB_模式2 = new System.Windows.Forms.RadioButton();
@@ -43,6 +44,9 @@
             this.LB_YSpeed = new System.Windows.Forms.Label();
             this.LB_XSpeed = new System.Windows.Forms.Label();
             this.GB_手动 = new System.Windows.Forms.GroupBox();
+            this.BTN_手动初始位置 = new System.Windows.Forms.Button();
+            this.BTN_手动X轴移动 = new System.Windows.Forms.Button();
+            this.BTN_手动运行 = new System.Windows.Forms.Button();
             this.BTN_回原点 = new System.Windows.Forms.Button();
             this.GB_Y = new System.Windows.Forms.GroupBox();
             this.BTN_Y右 = new System.Windows.Forms.Button();
@@ -85,6 +89,10 @@
             this.TB_起始位置 = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.GB_Y轴设置 = new System.Windows.Forms.GroupBox();
+            this.TB_YFastDec = new System.Windows.Forms.TextBox();
+            this.label32 = new System.Windows.Forms.Label();
+            this.TB_YPulseType = new System.Windows.Forms.TextBox();
+            this.label30 = new System.Windows.Forms.Label();
             this.TB_YAxisType = new System.Windows.Forms.TextBox();
             this.TB_YCreepSpeed = new System.Windows.Forms.TextBox();
             this.label29 = new System.Windows.Forms.Label();
@@ -110,6 +118,10 @@
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.GB_X轴设置 = new System.Windows.Forms.GroupBox();
+            this.TB_XFastDec = new System.Windows.Forms.TextBox();
+            this.label31 = new System.Windows.Forms.Label();
+            this.TB_XPulseType = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
             this.TB_XCreepSpeed = new System.Windows.Forms.TextBox();
             this.label27 = new System.Windows.Forms.Label();
             this.TB_X负软限位 = new System.Windows.Forms.TextBox();
@@ -143,9 +155,6 @@
             this.TB_AxisCode = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.BGW_Auto = new System.ComponentModel.BackgroundWorker();
-            this.BTN_手动运行 = new System.Windows.Forms.Button();
-            this.BTN_手动X轴移动 = new System.Windows.Forms.Button();
-            this.BTN_手动初始位置 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.TP_自动.SuspendLayout();
             this.GB_模式选择.SuspendLayout();
@@ -176,6 +185,7 @@
             // 
             // TP_自动
             // 
+            this.TP_自动.Controls.Add(this.BTN_断开);
             this.TP_自动.Controls.Add(this.BTN_停止);
             this.TP_自动.Controls.Add(this.GB_模式选择);
             this.TP_自动.Controls.Add(this.BTN_自动停止);
@@ -190,6 +200,16 @@
             this.TP_自动.TabIndex = 0;
             this.TP_自动.Text = "自动";
             this.TP_自动.UseVisualStyleBackColor = true;
+            // 
+            // BTN_断开
+            // 
+            this.BTN_断开.Location = new System.Drawing.Point(186, 304);
+            this.BTN_断开.Name = "BTN_断开";
+            this.BTN_断开.Size = new System.Drawing.Size(75, 23);
+            this.BTN_断开.TabIndex = 8;
+            this.BTN_断开.Text = "断开";
+            this.BTN_断开.UseVisualStyleBackColor = true;
+            this.BTN_断开.Click += new System.EventHandler(this.BTN_断开_Click);
             // 
             // BTN_停止
             // 
@@ -277,7 +297,7 @@
             // 
             // BTN_连接
             // 
-            this.BTN_连接.Location = new System.Drawing.Point(177, 304);
+            this.BTN_连接.Location = new System.Drawing.Point(88, 304);
             this.BTN_连接.Name = "BTN_连接";
             this.BTN_连接.Size = new System.Drawing.Size(75, 23);
             this.BTN_连接.TabIndex = 0;
@@ -287,8 +307,6 @@
             // 
             // TP_手动
             // 
-            this.TP_手动.Controls.Add(this.LB_YSpeed);
-            this.TP_手动.Controls.Add(this.LB_XSpeed);
             this.TP_手动.Controls.Add(this.GB_手动);
             this.TP_手动.Controls.Add(this.GB_Y);
             this.TP_手动.Controls.Add(this.GB_X);
@@ -303,7 +321,7 @@
             // LB_YSpeed
             // 
             this.LB_YSpeed.AutoSize = true;
-            this.LB_YSpeed.Location = new System.Drawing.Point(238, 192);
+            this.LB_YSpeed.Location = new System.Drawing.Point(6, 135);
             this.LB_YSpeed.Name = "LB_YSpeed";
             this.LB_YSpeed.Size = new System.Drawing.Size(47, 12);
             this.LB_YSpeed.TabIndex = 4;
@@ -312,7 +330,7 @@
             // LB_XSpeed
             // 
             this.LB_XSpeed.AutoSize = true;
-            this.LB_XSpeed.Location = new System.Drawing.Point(32, 192);
+            this.LB_XSpeed.Location = new System.Drawing.Point(6, 135);
             this.LB_XSpeed.Name = "LB_XSpeed";
             this.LB_XSpeed.Size = new System.Drawing.Size(47, 12);
             this.LB_XSpeed.TabIndex = 3;
@@ -331,6 +349,36 @@
             this.GB_手动.TabStop = false;
             this.GB_手动.Text = "手动";
             // 
+            // BTN_手动初始位置
+            // 
+            this.BTN_手动初始位置.Location = new System.Drawing.Point(87, 20);
+            this.BTN_手动初始位置.Name = "BTN_手动初始位置";
+            this.BTN_手动初始位置.Size = new System.Drawing.Size(75, 23);
+            this.BTN_手动初始位置.TabIndex = 3;
+            this.BTN_手动初始位置.Text = "初始位置";
+            this.BTN_手动初始位置.UseVisualStyleBackColor = true;
+            this.BTN_手动初始位置.Click += new System.EventHandler(this.BTN_手动初始位置_Click);
+            // 
+            // BTN_手动X轴移动
+            // 
+            this.BTN_手动X轴移动.Location = new System.Drawing.Point(6, 49);
+            this.BTN_手动X轴移动.Name = "BTN_手动X轴移动";
+            this.BTN_手动X轴移动.Size = new System.Drawing.Size(75, 23);
+            this.BTN_手动X轴移动.TabIndex = 2;
+            this.BTN_手动X轴移动.Text = "X轴移动";
+            this.BTN_手动X轴移动.UseVisualStyleBackColor = true;
+            this.BTN_手动X轴移动.Click += new System.EventHandler(this.BTN_手动X轴移动_Click);
+            // 
+            // BTN_手动运行
+            // 
+            this.BTN_手动运行.Location = new System.Drawing.Point(87, 49);
+            this.BTN_手动运行.Name = "BTN_手动运行";
+            this.BTN_手动运行.Size = new System.Drawing.Size(75, 23);
+            this.BTN_手动运行.TabIndex = 1;
+            this.BTN_手动运行.Text = "运行";
+            this.BTN_手动运行.UseVisualStyleBackColor = true;
+            this.BTN_手动运行.Click += new System.EventHandler(this.BTN_手动运行_Click);
+            // 
             // BTN_回原点
             // 
             this.BTN_回原点.Location = new System.Drawing.Point(6, 20);
@@ -343,6 +391,7 @@
             // 
             // GB_Y
             // 
+            this.GB_Y.Controls.Add(this.LB_YSpeed);
             this.GB_Y.Controls.Add(this.BTN_Y右);
             this.GB_Y.Controls.Add(this.LB_当前Y轴位置);
             this.GB_Y.Controls.Add(this.BTN_YStop);
@@ -443,11 +492,12 @@
             this.TB_Y绝对运动.Name = "TB_Y绝对运动";
             this.TB_Y绝对运动.Size = new System.Drawing.Size(100, 21);
             this.TB_Y绝对运动.TabIndex = 11;
-            this.TB_Y绝对运动.Text = "10";
+            this.TB_Y绝对运动.Text = "0";
             // 
             // GB_X
             // 
             this.GB_X.Controls.Add(this.BTN_X右);
+            this.GB_X.Controls.Add(this.LB_XSpeed);
             this.GB_X.Controls.Add(this.BTN_XStop);
             this.GB_X.Controls.Add(this.BTN_X左);
             this.GB_X.Controls.Add(this.BTN_X绝对运动);
@@ -510,7 +560,7 @@
             this.TB_X绝对运动.Name = "TB_X绝对运动";
             this.TB_X绝对运动.Size = new System.Drawing.Size(100, 21);
             this.TB_X绝对运动.TabIndex = 4;
-            this.TB_X绝对运动.Text = "10";
+            this.TB_X绝对运动.Text = "0";
             // 
             // BTN_X相对运动
             // 
@@ -578,7 +628,7 @@
             // 
             // TB_IP
             // 
-            this.TB_IP.Location = new System.Drawing.Point(37, 226);
+            this.TB_IP.Location = new System.Drawing.Point(35, 273);
             this.TB_IP.Name = "TB_IP";
             this.TB_IP.Size = new System.Drawing.Size(100, 21);
             this.TB_IP.TabIndex = 7;
@@ -587,7 +637,7 @@
             // LB_IP
             // 
             this.LB_IP.AutoSize = true;
-            this.LB_IP.Location = new System.Drawing.Point(14, 229);
+            this.LB_IP.Location = new System.Drawing.Point(12, 276);
             this.LB_IP.Name = "LB_IP";
             this.LB_IP.Size = new System.Drawing.Size(17, 12);
             this.LB_IP.TabIndex = 6;
@@ -748,6 +798,10 @@
             // 
             // GB_Y轴设置
             // 
+            this.GB_Y轴设置.Controls.Add(this.TB_YFastDec);
+            this.GB_Y轴设置.Controls.Add(this.label32);
+            this.GB_Y轴设置.Controls.Add(this.TB_YPulseType);
+            this.GB_Y轴设置.Controls.Add(this.label30);
             this.GB_Y轴设置.Controls.Add(this.TB_YAxisType);
             this.GB_Y轴设置.Controls.Add(this.TB_YCreepSpeed);
             this.GB_Y轴设置.Controls.Add(this.label29);
@@ -774,10 +828,44 @@
             this.GB_Y轴设置.Controls.Add(this.label8);
             this.GB_Y轴设置.Location = new System.Drawing.Point(259, 10);
             this.GB_Y轴设置.Name = "GB_Y轴设置";
-            this.GB_Y轴设置.Size = new System.Drawing.Size(245, 200);
+            this.GB_Y轴设置.Size = new System.Drawing.Size(245, 226);
             this.GB_Y轴设置.TabIndex = 1;
             this.GB_Y轴设置.TabStop = false;
             this.GB_Y轴设置.Text = "Y轴设置";
+            // 
+            // TB_YFastDec
+            // 
+            this.TB_YFastDec.Location = new System.Drawing.Point(77, 178);
+            this.TB_YFastDec.Name = "TB_YFastDec";
+            this.TB_YFastDec.Size = new System.Drawing.Size(38, 21);
+            this.TB_YFastDec.TabIndex = 9;
+            this.TB_YFastDec.Text = "1000";
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(6, 181);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(65, 12);
+            this.label32.TabIndex = 24;
+            this.label32.Text = "快速减速度";
+            // 
+            // TB_YPulseType
+            // 
+            this.TB_YPulseType.Location = new System.Drawing.Point(186, 178);
+            this.TB_YPulseType.Name = "TB_YPulseType";
+            this.TB_YPulseType.Size = new System.Drawing.Size(51, 21);
+            this.TB_YPulseType.TabIndex = 32;
+            this.TB_YPulseType.Text = "0";
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(121, 181);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(53, 12);
+            this.label30.TabIndex = 31;
+            this.label30.Text = "脉冲类型";
             // 
             // TB_YAxisType
             // 
@@ -819,7 +907,7 @@
             this.TB_Y负软限位.Name = "TB_Y负软限位";
             this.TB_Y负软限位.Size = new System.Drawing.Size(51, 21);
             this.TB_Y负软限位.TabIndex = 28;
-            this.TB_Y负软限位.Text = "-10";
+            this.TB_Y负软限位.Text = "-100";
             // 
             // TB_Y正软限位
             // 
@@ -849,9 +937,9 @@
             // 
             // TB_Y负限位信号
             // 
-            this.TB_Y负限位信号.Location = new System.Drawing.Point(187, 70);
+            this.TB_Y负限位信号.Location = new System.Drawing.Point(186, 70);
             this.TB_Y负限位信号.Name = "TB_Y负限位信号";
-            this.TB_Y负限位信号.Size = new System.Drawing.Size(50, 21);
+            this.TB_Y负限位信号.Size = new System.Drawing.Size(51, 21);
             this.TB_Y负限位信号.TabIndex = 24;
             this.TB_Y负限位信号.Text = "-1";
             // 
@@ -866,9 +954,9 @@
             // 
             // TB_Y正限位信号
             // 
-            this.TB_Y正限位信号.Location = new System.Drawing.Point(187, 42);
+            this.TB_Y正限位信号.Location = new System.Drawing.Point(186, 42);
             this.TB_Y正限位信号.Name = "TB_Y正限位信号";
-            this.TB_Y正限位信号.Size = new System.Drawing.Size(50, 21);
+            this.TB_Y正限位信号.Size = new System.Drawing.Size(51, 21);
             this.TB_Y正限位信号.TabIndex = 22;
             this.TB_Y正限位信号.Text = "-1";
             // 
@@ -883,9 +971,9 @@
             // 
             // TB_Y原点信号
             // 
-            this.TB_Y原点信号.Location = new System.Drawing.Point(187, 15);
+            this.TB_Y原点信号.Location = new System.Drawing.Point(186, 15);
             this.TB_Y原点信号.Name = "TB_Y原点信号";
-            this.TB_Y原点信号.Size = new System.Drawing.Size(50, 21);
+            this.TB_Y原点信号.Size = new System.Drawing.Size(51, 21);
             this.TB_Y原点信号.TabIndex = 20;
             this.TB_Y原点信号.Text = "1";
             // 
@@ -985,6 +1073,10 @@
             // 
             // GB_X轴设置
             // 
+            this.GB_X轴设置.Controls.Add(this.TB_XFastDec);
+            this.GB_X轴设置.Controls.Add(this.label31);
+            this.GB_X轴设置.Controls.Add(this.TB_XPulseType);
+            this.GB_X轴设置.Controls.Add(this.label19);
             this.GB_X轴设置.Controls.Add(this.TB_XCreepSpeed);
             this.GB_X轴设置.Controls.Add(this.label27);
             this.GB_X轴设置.Controls.Add(this.TB_X负软限位);
@@ -1011,10 +1103,44 @@
             this.GB_X轴设置.Controls.Add(this.label1);
             this.GB_X轴设置.Location = new System.Drawing.Point(8, 10);
             this.GB_X轴设置.Name = "GB_X轴设置";
-            this.GB_X轴设置.Size = new System.Drawing.Size(245, 200);
+            this.GB_X轴设置.Size = new System.Drawing.Size(245, 226);
             this.GB_X轴设置.TabIndex = 0;
             this.GB_X轴设置.TabStop = false;
             this.GB_X轴设置.Text = "X轴设置";
+            // 
+            // TB_XFastDec
+            // 
+            this.TB_XFastDec.Location = new System.Drawing.Point(77, 178);
+            this.TB_XFastDec.Name = "TB_XFastDec";
+            this.TB_XFastDec.Size = new System.Drawing.Size(38, 21);
+            this.TB_XFastDec.TabIndex = 24;
+            this.TB_XFastDec.Text = "1000";
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(6, 181);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(65, 12);
+            this.label31.TabIndex = 23;
+            this.label31.Text = "快速减速度";
+            // 
+            // TB_XPulseType
+            // 
+            this.TB_XPulseType.Location = new System.Drawing.Point(186, 178);
+            this.TB_XPulseType.Name = "TB_XPulseType";
+            this.TB_XPulseType.Size = new System.Drawing.Size(51, 21);
+            this.TB_XPulseType.TabIndex = 22;
+            this.TB_XPulseType.Text = "0";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(121, 181);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(53, 12);
+            this.label19.TabIndex = 21;
+            this.label19.Text = "脉冲类型";
             // 
             // TB_XCreepSpeed
             // 
@@ -1039,7 +1165,7 @@
             this.TB_X负软限位.Name = "TB_X负软限位";
             this.TB_X负软限位.Size = new System.Drawing.Size(51, 21);
             this.TB_X负软限位.TabIndex = 18;
-            this.TB_X负软限位.Text = "-10";
+            this.TB_X负软限位.Text = "-100";
             // 
             // TB_X正软限位
             // 
@@ -1086,9 +1212,9 @@
             // 
             // TB_X负限位信号
             // 
-            this.TB_X负限位信号.Location = new System.Drawing.Point(187, 70);
+            this.TB_X负限位信号.Location = new System.Drawing.Point(186, 70);
             this.TB_X负限位信号.Name = "TB_X负限位信号";
-            this.TB_X负限位信号.Size = new System.Drawing.Size(50, 21);
+            this.TB_X负限位信号.Size = new System.Drawing.Size(51, 21);
             this.TB_X负限位信号.TabIndex = 14;
             this.TB_X负限位信号.Text = "-1";
             // 
@@ -1103,9 +1229,9 @@
             // 
             // TB_X正限位信号
             // 
-            this.TB_X正限位信号.Location = new System.Drawing.Point(187, 42);
+            this.TB_X正限位信号.Location = new System.Drawing.Point(186, 42);
             this.TB_X正限位信号.Name = "TB_X正限位信号";
-            this.TB_X正限位信号.Size = new System.Drawing.Size(50, 21);
+            this.TB_X正限位信号.Size = new System.Drawing.Size(51, 21);
             this.TB_X正限位信号.TabIndex = 12;
             this.TB_X正限位信号.Text = "-1";
             // 
@@ -1120,9 +1246,9 @@
             // 
             // TB_X原点信号
             // 
-            this.TB_X原点信号.Location = new System.Drawing.Point(187, 14);
+            this.TB_X原点信号.Location = new System.Drawing.Point(186, 14);
             this.TB_X原点信号.Name = "TB_X原点信号";
-            this.TB_X原点信号.Size = new System.Drawing.Size(50, 21);
+            this.TB_X原点信号.Size = new System.Drawing.Size(51, 21);
             this.TB_X原点信号.TabIndex = 10;
             this.TB_X原点信号.Text = "0";
             // 
@@ -1304,36 +1430,6 @@
             this.label18.TabIndex = 0;
             this.label18.Text = "轴号";
             // 
-            // BTN_手动运行
-            // 
-            this.BTN_手动运行.Location = new System.Drawing.Point(87, 49);
-            this.BTN_手动运行.Name = "BTN_手动运行";
-            this.BTN_手动运行.Size = new System.Drawing.Size(75, 23);
-            this.BTN_手动运行.TabIndex = 1;
-            this.BTN_手动运行.Text = "运行";
-            this.BTN_手动运行.UseVisualStyleBackColor = true;
-            this.BTN_手动运行.Click += new System.EventHandler(this.BTN_手动运行_Click);
-            // 
-            // BTN_手动X轴移动
-            // 
-            this.BTN_手动X轴移动.Location = new System.Drawing.Point(6, 49);
-            this.BTN_手动X轴移动.Name = "BTN_手动X轴移动";
-            this.BTN_手动X轴移动.Size = new System.Drawing.Size(75, 23);
-            this.BTN_手动X轴移动.TabIndex = 2;
-            this.BTN_手动X轴移动.Text = "X轴移动";
-            this.BTN_手动X轴移动.UseVisualStyleBackColor = true;
-            this.BTN_手动X轴移动.Click += new System.EventHandler(this.BTN_手动X轴移动_Click);
-            // 
-            // BTN_手动初始位置
-            // 
-            this.BTN_手动初始位置.Location = new System.Drawing.Point(87, 20);
-            this.BTN_手动初始位置.Name = "BTN_手动初始位置";
-            this.BTN_手动初始位置.Size = new System.Drawing.Size(75, 23);
-            this.BTN_手动初始位置.TabIndex = 3;
-            this.BTN_手动初始位置.Text = "初始位置";
-            this.BTN_手动初始位置.UseVisualStyleBackColor = true;
-            this.BTN_手动初始位置.Click += new System.EventHandler(this.BTN_手动初始位置_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1349,7 +1445,6 @@
             this.GB_模式选择.ResumeLayout(false);
             this.GB_模式选择.PerformLayout();
             this.TP_手动.ResumeLayout(false);
-            this.TP_手动.PerformLayout();
             this.GB_手动.ResumeLayout(false);
             this.GB_Y.ResumeLayout(false);
             this.GB_Y.PerformLayout();
@@ -1490,6 +1585,15 @@
         private System.Windows.Forms.Button BTN_手动运行;
         private System.Windows.Forms.Button BTN_手动X轴移动;
         private System.Windows.Forms.Button BTN_手动初始位置;
+        private System.Windows.Forms.TextBox TB_XPulseType;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.TextBox TB_YPulseType;
+        private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.TextBox TB_YFastDec;
+        private System.Windows.Forms.TextBox TB_XFastDec;
+        private System.Windows.Forms.Button BTN_断开;
     }
 }
 

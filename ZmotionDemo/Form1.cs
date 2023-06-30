@@ -47,11 +47,11 @@ namespace ZmotionDemo
         private void BGW_Auto_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             isLaserWork = false;
+            card.SetOutput(int.Parse(TB_LaserSignal.Text), 0);
         }
 
         private void BGW_Auto_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            if (BGW_Auto.IsBusy) return;
             AutoRun(BGW_Auto.CancellationPending);
         }
 
@@ -82,9 +82,9 @@ namespace ZmotionDemo
             card.AddAxis(int.Parse(TB_XAxisType.Text), 0, unitsX);
             card.AddAxis(int.Parse(TB_YAxisType.Text), 1, unitsY);
             //card.Axes[0].Initialize(TB_X脉冲当量.Text, TB_X运行速度.Text, TB_X加速度.Text, TB_X减速度.Text, TB_XS曲线.Text, TB_XCreepSpeed.Text);
-            card.Axes[0].Initialize(GetFloat(TB_X运行速度.Text), GetFloat(TB_X加速度.Text), GetFloat(TB_X减速度.Text), GetFloat(TB_XS曲线.Text), GetFloat(TB_XCreepSpeed.Text));
+            card.Axes[0].Initialize(int.Parse(TB_XPulseType.Text), GetFloat(TB_X运行速度.Text), GetFloat(TB_X加速度.Text), GetFloat(TB_X减速度.Text), GetFloat(TB_XS曲线.Text), GetFloat(TB_XCreepSpeed.Text), GetFloat(TB_XFastDec.Text));
             //card.Axes[1].Initialize(TB_Y脉冲当量.Text, TB_Y运行速度.Text, TB_Y加速度.Text, TB_Y减速度.Text, TB_YS曲线.Text, TB_YCreepSpeed.Text);
-            card.Axes[1].Initialize(GetFloat(TB_Y运行速度.Text), GetFloat(TB_Y加速度.Text), GetFloat(TB_Y减速度.Text), GetFloat(TB_YS曲线.Text), GetFloat(TB_YCreepSpeed.Text));
+            card.Axes[1].Initialize(int.Parse(TB_YPulseType.Text), GetFloat(TB_Y运行速度.Text), GetFloat(TB_Y加速度.Text), GetFloat(TB_Y减速度.Text), GetFloat(TB_YS曲线.Text), GetFloat(TB_YCreepSpeed.Text), GetFloat(TB_YFastDec.Text));
             card.Axes[0].InitializeDatum(int.Parse(TB_X原点信号.Text));
             card.Axes[1].InitializeDatum(int.Parse(TB_Y原点信号.Text));
             card.Axes[0].SetLimitSignal(int.Parse(TB_X正限位信号.Text), int.Parse(TB_X负限位信号.Text));
@@ -108,6 +108,9 @@ namespace ZmotionDemo
             TB_X负限位信号.Text = config.Load("X负限位信号");
             TB_X正软限位.Text = config.Load("X正软限位");
             TB_X负软限位.Text = config.Load("X负软限位");
+            TB_XPulseType.Text = config.Load("X轴脉冲类型");
+            TB_XAxisType.Text = config.Load("X轴类型");
+            TB_XFastDec.Text = config.Load("X刹车减速度");
 
             TB_Y脉冲当量.Text = config.Load("Y脉冲当量");
             TB_Y运行速度.Text = config.Load("Y运行速度");
@@ -120,6 +123,9 @@ namespace ZmotionDemo
             TB_Y负限位信号.Text = config.Load("Y负限位信号");
             TB_Y正软限位.Text = config.Load("Y正软限位");
             TB_Y负软限位.Text = config.Load("Y负软限位");
+            TB_YPulseType.Text = config.Load("Y轴脉冲类型");
+            TB_YAxisType.Text = config.Load("Y轴类型");
+            TB_YFastDec.Text = config.Load("Y刹车减速度");
 
             TB_起始位置.Text = config.Load("起始位置X");
             TB_终止位置.Text = config.Load("终止位置Y");
@@ -128,7 +134,7 @@ namespace ZmotionDemo
             TB_LaserOffPos.Text = config.Load("激光关闭位置");
             TB_LaserSignal.Text = config.Load("激光信号");
             TB_切割次数.Text = config.Load("切割次数");
-            TB_XAxisType.Text = config.Load("轴类型");
+
             TB_IP.Text = config.Load("IP");
         }
 
@@ -144,7 +150,10 @@ namespace ZmotionDemo
             config.Change("X正限位信号", TB_X正限位信号.Text);
             config.Change("X负限位信号", TB_X负限位信号.Text);
             config.Change("X正软限位", TB_X正软限位.Text);
-            config.Change("X负软限位", TB_X正软限位.Text);
+            config.Change("X负软限位", TB_X负软限位.Text);
+            config.Change("X轴脉冲类型", TB_XPulseType.Text);
+            config.Change("X轴类型", TB_XAxisType.Text);
+            config.Change("X刹车减速度", TB_XFastDec.Text);
 
             config.Change("Y脉冲当量", TB_Y脉冲当量.Text);
             config.Change("Y运行速度", TB_Y运行速度.Text);
@@ -156,7 +165,10 @@ namespace ZmotionDemo
             config.Change("Y正限位信号", TB_Y正限位信号.Text);
             config.Change("Y负限位信号", TB_Y负限位信号.Text);
             config.Change("Y正软限位", TB_Y正软限位.Text);
-            config.Change("Y负软限位", TB_Y正软限位.Text);
+            config.Change("Y负软限位", TB_Y负软限位.Text);
+            config.Change("Y轴脉冲类型", TB_YPulseType.Text);
+            config.Change("Y轴类型", TB_YAxisType.Text);
+            config.Change("Y刹车减速度", TB_YFastDec.Text);
 
             config.Change("起始位置X", TB_起始位置.Text);
             config.Change("终止位置Y", TB_终止位置.Text);
@@ -165,7 +177,7 @@ namespace ZmotionDemo
             config.Change("激光关闭位置", TB_LaserOffPos.Text);
             config.Change("激光信号", TB_LaserSignal.Text);
             config.Change("切割次数", TB_切割次数.Text);
-            config.Change("轴类型", TB_XAxisType.Text);
+
             config.Change("IP", TB_IP.Text);
         }
 
@@ -173,11 +185,11 @@ namespace ZmotionDemo
         {
             while (true)
             {
-                Thread.Sleep(500);
+                Thread.Sleep(100);
                 OnThread(LB_当前X轴位置, new Action(() => LB_当前X轴位置.Text = $"当前位置：{card.Axes[0].CurrentPosition:f2}"));
                 OnThread(LB_当前Y轴位置, new Action(() => LB_当前Y轴位置.Text = $"当前位置：{card.Axes[1].CurrentPosition:f2}"));
-                OnThread(LB_XSpeed, new Action(() => LB_XSpeed.Text = $"X轴速度：{card.Axes[0].GetSpeed():f2}"));
-                OnThread(LB_YSpeed, new Action(() => LB_XSpeed.Text = $"Y轴速度：{card.Axes[1].GetSpeed():f2}"));
+                OnThread(LB_XSpeed, new Action(() => LB_XSpeed.Text = $"X轴速度：{card.Axes[0].GetMSpeed():f2}"));
+                OnThread(LB_YSpeed, new Action(() => LB_YSpeed.Text = $"Y轴速度：{card.Axes[1].GetMSpeed():f2}"));
             }
         }
 
@@ -260,6 +272,7 @@ namespace ZmotionDemo
                 card.Axes[0].Wait();
                 for (int i = 0; i < int.Parse(TB_切割次数.Text); i++)
                 {
+                    isLaserWork = true;
                     card.Axes[1].Direction = 1;
                     card.Axes[1].AbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
                     card.Axes[1].Wait();
@@ -361,39 +374,6 @@ namespace ZmotionDemo
         }
         #endregion
 
-        private void BTN_设置_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                card.Axes[0].Initialize(TB_X运行速度.Text, TB_X加速度.Text, TB_X减速度.Text, TB_XS曲线.Text, TB_XCreepSpeed.Text);
-                card.Axes[1].Initialize(TB_Y运行速度.Text, TB_Y加速度.Text, TB_Y减速度.Text, TB_YS曲线.Text, TB_YCreepSpeed.Text);
-                card.Axes[0].InitializeDatum(int.Parse(TB_X原点信号.Text));
-                card.Axes[1].InitializeDatum(int.Parse(TB_Y原点信号.Text));
-                card.Axes[0].SetLimitSignal(int.Parse(TB_X正限位信号.Text), int.Parse(TB_X负限位信号.Text));
-                card.Axes[1].SetLimitSignal(int.Parse(TB_Y正限位信号.Text), int.Parse(TB_Y负限位信号.Text));
-                card.Axes[0].SetLimit(float.Parse(TB_X正软限位.Text), float.Parse(TB_X负软限位.Text));
-                card.Axes[1].SetLimit(float.Parse(TB_Y正软限位.Text), float.Parse(TB_Y负软限位.Text));
-                MessageBox.Show("设置成功。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("设置失败。" + ex.Message, "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void BTN_保存设置_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                SaveConfig();
-                MessageBox.Show("保存完成。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("保存失败。" + ex.Message, "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         #region 校准
         private void BTN_回零校准_Click(object sender, EventArgs e)
         {
@@ -461,7 +441,32 @@ namespace ZmotionDemo
         #region 自动
         private void BTN_连接_Click(object sender, EventArgs e)
         {
+            try
+            {
+                if (card.Connect(TB_IP.Text))
+                {
+                    MessageBox.Show("控制器链接成功!", "提示");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("连接失败。" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
+        private void BTN_断开_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (card.Close())
+                {
+                    MessageBox.Show("控制器断开成功!", "提示");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("断开失败。" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void BTN_自动模式_Click(object sender, EventArgs e)
@@ -616,7 +621,7 @@ namespace ZmotionDemo
         {
             try
             {
-                card.Axes[0].Direction = 1;
+                card.Axes[0].Direction = -1;
                 card.Axes[0].ContinuousMove();
             }
             catch (Exception ex)
@@ -642,7 +647,7 @@ namespace ZmotionDemo
         {
             try
             {
-                card.Axes[0].Direction = -1;
+                card.Axes[0].Direction = 1;
                 card.Axes[0].ContinuousMove();
             }
             catch (Exception ex)
@@ -682,7 +687,7 @@ namespace ZmotionDemo
         {
             try
             {
-                card.Axes[1].Direction = 1;
+                card.Axes[1].Direction = -1;
                 card.Axes[1].ContinuousMove();
             }
             catch (Exception ex)
@@ -707,7 +712,7 @@ namespace ZmotionDemo
         {
             try
             {
-                card.Axes[1].Direction = -1;
+                card.Axes[1].Direction = 1;
                 card.Axes[1].ContinuousMove();
             }
             catch (Exception ex)
@@ -788,8 +793,41 @@ namespace ZmotionDemo
                 MessageBox.Show("初始化失败");
             }
         }
+
         #endregion
 
+        private void BTN_设置_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                card.Axes[0].Initialize(int.Parse(TB_XPulseType.Text), TB_X运行速度.Text, TB_X加速度.Text, TB_X减速度.Text, TB_XS曲线.Text, TB_XCreepSpeed.Text, TB_XFastDec.Text);
+                card.Axes[1].Initialize(int.Parse(TB_YPulseType.Text), TB_Y运行速度.Text, TB_Y加速度.Text, TB_Y减速度.Text, TB_YS曲线.Text, TB_YCreepSpeed.Text, TB_YFastDec.Text);
+                card.Axes[0].InitializeDatum(int.Parse(TB_X原点信号.Text));
+                card.Axes[1].InitializeDatum(int.Parse(TB_Y原点信号.Text));
+                card.Axes[0].SetLimitSignal(int.Parse(TB_X正限位信号.Text), int.Parse(TB_X负限位信号.Text));
+                card.Axes[1].SetLimitSignal(int.Parse(TB_Y正限位信号.Text), int.Parse(TB_Y负限位信号.Text));
+                card.Axes[0].SetLimit(float.Parse(TB_X正软限位.Text), float.Parse(TB_X负软限位.Text));
+                card.Axes[1].SetLimit(float.Parse(TB_Y正软限位.Text), float.Parse(TB_Y负软限位.Text));
+                MessageBox.Show("设置成功。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("设置失败。" + ex.Message, "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BTN_保存设置_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SaveConfig();
+                MessageBox.Show("保存完成。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("保存失败。" + ex.Message, "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
     }
 }

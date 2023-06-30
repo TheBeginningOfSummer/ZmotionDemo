@@ -23,10 +23,18 @@ namespace ZmotionDemo
                 return false;
         }
 
-        public void Close()
+        public bool Close()
         {
-            G_handle = (IntPtr)0;
-            Zmcaux.ZAux_Close(G_handle);
+            int result = Zmcaux.ZAux_Close(G_handle);
+            if (result == 0)
+            {
+                G_handle = (IntPtr)0;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public void AddAxis(int type, int number, float units)
@@ -72,6 +80,7 @@ namespace ZmotionDemo
                 {
                     isMoving = value;
                     Zmcaux.ZAux_Direct_GetDpos(Handle, AxisNumber, ref CurrentPosition);
+                    CurrentPosition /= AxisUnits;
                     MovingAction?.Invoke(CurrentPosition);
                 }
             }
@@ -92,10 +101,12 @@ namespace ZmotionDemo
         /// <summary>
         /// 初始化轴参数string
         /// </summary>
-        /// <param name="arg">参数，依次为速度、加速度、减速度、S曲线（选用 爬行速度、初始速度）</param>
-        public void Initialize(params string[] arg)
+        /// <param name="pulseType">脉冲输出类型</param>
+        /// <param name="arg">参数依次为速度、加速度、减速度、S曲线（选用 爬行速度、刹车减速度、初始速度）</param>
+        public void Initialize(int pulseType, params string[] arg)
         {
             if (arg == null || arg.Length < 4) return;
+            Zmcaux.ZAux_Direct_SetInvertStep(Handle, AxisNumber, pulseType);
             Zmcaux.ZAux_Direct_SetUnits(Handle, AxisNumber, AxisUnits);
             Zmcaux.ZAux_Direct_SetSpeed(Handle, AxisNumber, Convert.ToSingle(arg[0]) * AxisUnits);
             Zmcaux.ZAux_Direct_SetAccel(Handle, AxisNumber, Convert.ToSingle(arg[1]) * AxisUnits);
@@ -104,16 +115,20 @@ namespace ZmotionDemo
             if (arg.Length > 4)
                 Zmcaux.ZAux_Direct_SetCreep(Handle, AxisNumber, Convert.ToSingle(arg[4]) * AxisUnits);
             if (arg.Length > 5)
-                Zmcaux.ZAux_Direct_SetLspeed(Handle, AxisNumber, Convert.ToSingle(arg[5]) * AxisUnits);
+                Zmcaux.ZAux_Direct_SetFastDec(Handle, AxisNumber, Convert.ToSingle(arg[5]) * AxisUnits);
+            if (arg.Length > 6)
+                Zmcaux.ZAux_Direct_SetLspeed(Handle, AxisNumber, Convert.ToSingle(arg[6]) * AxisUnits);
             Task.Run(UpdateStatus);
         }
         /// <summary>
         /// 初始化轴参数float
         /// </summary>
-        /// <param name="arg">参数，依次为速度、加速度、减速度、S曲线（选用 爬行速度、初始速度）</param>
-        public void Initialize(params float[] arg)
+        /// <param name="pulseType">脉冲输出类型</param>
+        /// <param name="arg">参数依次为速度、加速度、减速度、S曲线（选用 爬行速度、刹车减速度、初始速度）</param>
+        public void Initialize(int pulseType, params float[] arg)
         {
             if (arg == null || arg.Length < 4) return;
+            Zmcaux.ZAux_Direct_SetInvertStep(Handle, AxisNumber, pulseType);
             Zmcaux.ZAux_Direct_SetUnits(Handle, AxisNumber, AxisUnits);
             Zmcaux.ZAux_Direct_SetSpeed(Handle, AxisNumber, arg[0] * AxisUnits);
             Zmcaux.ZAux_Direct_SetAccel(Handle, AxisNumber, arg[1] * AxisUnits);
@@ -122,7 +137,9 @@ namespace ZmotionDemo
             if (arg.Length > 4)
                 Zmcaux.ZAux_Direct_SetCreep(Handle, AxisNumber, arg[4] * AxisUnits);
             if (arg.Length > 5)
-                Zmcaux.ZAux_Direct_SetLspeed(Handle, AxisNumber, arg[5] * AxisUnits);
+                Zmcaux.ZAux_Direct_SetFastDec(Handle, AxisNumber, arg[5] * AxisUnits);
+            if (arg.Length > 6)
+                Zmcaux.ZAux_Direct_SetLspeed(Handle, AxisNumber, arg[6] * AxisUnits);
             Task.Run(UpdateStatus);
         }
         /// <summary>
@@ -153,12 +170,10 @@ namespace ZmotionDemo
         /// </summary>
         /// <param name="forward">正限位距离</param>
         /// <param name="reverse">负限位距离</param>
-        public void SetLimit(float forward = -1, float reverse = -1)
+        public void SetLimit(float forward = 100, float reverse = -100)
         {
-            if (forward >= 0)
-                Zmcaux.ZAux_Direct_SetFsLimit(Handle, AxisNumber, forward * AxisUnits);
-            if (reverse >= 0)
-                Zmcaux.ZAux_Direct_SetRsLimit(Handle, AxisNumber, reverse * AxisUnits);
+            Zmcaux.ZAux_Direct_SetFsLimit(Handle, AxisNumber, forward * AxisUnits);
+            Zmcaux.ZAux_Direct_SetRsLimit(Handle, AxisNumber, reverse * AxisUnits);
         }
         #endregion
 
@@ -180,11 +195,15 @@ namespace ZmotionDemo
         {
             if (CurrentPosition > 0)
             {
-                return Zmcaux.ZAux_Direct_Single_Datum(Handle, AxisNumber, 4);
+                return Zmcaux.ZAux_Direct_Single_Datum(Handle, AxisNumber, 13);
+            }
+            else if (CurrentPosition < 0)
+            {
+                return Zmcaux.ZAux_Direct_Single_Datum(Handle, AxisNumber, 14);
             }
             else
             {
-                return Zmcaux.ZAux_Direct_Single_Datum(Handle, AxisNumber, 3);
+                return 0;
             }
         }
         /// <summary>
@@ -255,13 +274,21 @@ namespace ZmotionDemo
         }
         #endregion
 
+        #region 状态
+        /// <summary>
+        /// 得到设置的速度
+        /// </summary>
+        /// <returns></returns>
         public float GetSpeed()
         {
             float speed = 0;
             Zmcaux.ZAux_Direct_GetSpeed(Handle, AxisNumber, ref speed);
             return speed / AxisUnits;
         }
-
+        /// <summary>
+        /// 得到编码器速度（实时速度）
+        /// </summary>
+        /// <returns></returns>
         public float GetMSpeed()
         {
             float speed = 0;
@@ -301,7 +328,7 @@ namespace ZmotionDemo
                 }
             }
         }
+        #endregion
 
-        
     }
 }
