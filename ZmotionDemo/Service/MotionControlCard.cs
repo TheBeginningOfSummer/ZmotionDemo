@@ -60,6 +60,23 @@ namespace ZmotionDemo
             Zmcaux.ZAux_Direct_GetIn(G_handle, num, ref value);
             return value;
         }
+
+        public void Scram()
+        {
+            foreach (Axis axis in Axes)
+            {
+                axis.IsScram = true;
+            }
+            Zmcaux.ZAux_Direct_Rapidstop(G_handle, 0);
+        }
+
+        public void Start()
+        {
+            foreach (Axis axis in Axes)
+            {
+                axis.IsScram = false;
+            }
+        }
     }
 
     public class Axis
@@ -87,6 +104,9 @@ namespace ZmotionDemo
         }
         public float CurrentPosition;
         public Action<float> MovingAction;
+        public Action MovingTimeout;
+
+        public bool IsScram = false;
 
         public Axis(int type, int number, float units, IntPtr handle)
         {
@@ -212,6 +232,7 @@ namespace ZmotionDemo
         /// <returns></returns>
         public int ContinuousMove()
         {
+            if (IsScram) return -1;
             return Zmcaux.ZAux_Direct_Single_Vmove(Handle, AxisNumber, Direction);
         }
         /// <summary>
@@ -221,6 +242,7 @@ namespace ZmotionDemo
         /// <returns></returns>
         public int RelativeMove(float distance)
         {
+            if (IsScram) return -1;
             return Zmcaux.ZAux_Direct_Single_Move(Handle, AxisNumber, distance * AxisUnits);
         }
         /// <summary>
@@ -230,7 +252,28 @@ namespace ZmotionDemo
         /// <returns></returns>
         public int AbsoluteMove(float distance)
         {
+            if (IsScram) return -1;
             return Zmcaux.ZAux_Direct_Single_MoveAbs(Handle, AxisNumber, distance * AxisUnits);
+        }
+
+        public void SingleRelativeMove(float distance, float timeout = 0)
+        {
+            if (IsScram) return;
+            Zmcaux.ZAux_Direct_Single_Move(Handle, AxisNumber, distance * AxisUnits);
+            if (timeout <= 0)
+                Wait();
+            else
+                Wait(timeout * 1000);
+        }
+
+        public void SingleAbsoluteMove(float coordinate, float timeout = 0)
+        {
+            if (IsScram) return;
+            Zmcaux.ZAux_Direct_Single_MoveAbs(Handle, AxisNumber, coordinate * AxisUnits);
+            if (timeout <= 0)
+                Wait();
+            else
+                Wait(timeout * 1000);
         }
         /// <summary>
         /// 停止运动
@@ -246,7 +289,9 @@ namespace ZmotionDemo
         {
             return Zmcaux.ZAux_Direct_Single_Cancel(Handle, AxisNumber, mode);
         }
-
+        /// <summary>
+        /// 等待运动停止
+        /// </summary>
         public void Wait()
         {
             Thread.Sleep(500);
@@ -255,8 +300,12 @@ namespace ZmotionDemo
                 Thread.Sleep(50);
             } while (IsMoving);
         }
-
-        public bool Wait(double delay)
+        /// <summary>
+        /// 等待运动停止
+        /// </summary>
+        /// <param name="delay">超时时间</param>
+        /// <returns>true等待完成，false超时</returns>
+        public bool Wait(float delay)
         {
             int i = 0;
             Thread.Sleep(500);
@@ -266,6 +315,7 @@ namespace ZmotionDemo
                 Thread.Sleep(50);
                 if (i * 50 > delay)
                 {
+                    MovingTimeout?.Invoke();
                     //超时报警，可用委托
                     return false;
                 }
@@ -327,6 +377,13 @@ namespace ZmotionDemo
                     MovingAction?.Invoke(CurrentPosition);
                 }
             }
+        }
+        #endregion
+
+        #region 设置
+        public void SetSpeed(float speed)
+        {
+            Zmcaux.ZAux_Direct_SetSpeed(Handle, AxisNumber, speed * AxisUnits);
         }
         #endregion
 

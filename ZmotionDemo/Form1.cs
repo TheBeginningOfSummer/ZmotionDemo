@@ -1,5 +1,6 @@
 ﻿using cszmcaux;
 using System;
+using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -10,8 +11,10 @@ namespace ZmotionDemo
     {
         readonly KeyValueLoader config = new KeyValueLoader("Configuration.json", "Config");
         readonly MotionControlCard card = new MotionControlCard();
+        readonly ManualResetEvent suspend = new ManualResetEvent(true);
         private bool isAuto = false;
         private bool isLaserWork = false;
+        private bool isSuspend = true;
 
         public Form1()
         {
@@ -26,9 +29,13 @@ namespace ZmotionDemo
                     InitializeAxesConfig();
                     Task.Run(UpdateCardStatus);
                     card.Axes[1].MovingAction += YAxisMoving;
+                    card.Axes[0].MovingTimeout += AxisTimeout;
+                    card.Axes[1].MovingTimeout += AxisTimeout;
                     BGW_Auto.DoWork += BGW_Auto_DoWork;
                     BGW_Auto.WorkerSupportsCancellation = true;
                     BGW_Auto.RunWorkerCompleted += BGW_Auto_RunWorkerCompleted;
+                    card.Axes[0].AbsoluteMove(0);
+                    card.Axes[1].AbsoluteMove(0);
                 }
                 else
                     MessageBox.Show("控制器链接失败，请检测IP地址!", "警告");
@@ -99,6 +106,8 @@ namespace ZmotionDemo
                 OnThread(LB_当前Y轴位置, new Action(() => LB_当前Y轴位置.Text = $"当前位置：{card.Axes[1].CurrentPosition:f2}"));
                 OnThread(LB_XSpeed, new Action(() => LB_XSpeed.Text = $"X轴速度：{card.Axes[0].GetMSpeed():f2}"));
                 OnThread(LB_YSpeed, new Action(() => LB_YSpeed.Text = $"Y轴速度：{card.Axes[1].GetMSpeed():f2}"));
+                OnThread(LB_Test1, new Action(() => LB_Test1.Text = $"X轴当前位置：{card.Axes[0].CurrentPosition:f2}"));
+                OnThread(LB_Test2, new Action(() => LB_Test2.Text = $"Y轴当前位置：{card.Axes[1].CurrentPosition:f2}"));
             }
         }
 
@@ -143,6 +152,7 @@ namespace ZmotionDemo
             TB_切割次数.Text = config.Load("切割次数");
 
             TB_IP.Text = config.Load("IP");
+            TB_运动超时时间.Text = config.Load("运动超时时间");
         }
 
         public void SaveConfig()
@@ -186,10 +196,22 @@ namespace ZmotionDemo
             config.Change("切割次数", TB_切割次数.Text);
 
             config.Change("IP", TB_IP.Text);
+            config.Change("运动超时时间", TB_运动超时时间.Text);
         }
 
         private void AutoRun()
         {
+            if (!float.TryParse(TB_运动超时时间.Text, out float timeout))
+            {
+                MessageBox.Show("请输入超时时间。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (!int.TryParse(TB_切割次数.Text, out int cutTimes))
+            {
+                MessageBox.Show("请输入整数。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             isLaserWork = false;
             if (card.Axes[0].IsMoving)
             {
@@ -205,79 +227,66 @@ namespace ZmotionDemo
             card.Axes[1].Direction = 1;
             card.Axes[0].Home();
             card.Axes[1].Home();
+            //if (!card.Axes[0].Wait(timeout)) return;
+            //if (!card.Axes[1].Wait(timeout)) return;
             card.Axes[0].Wait();
             card.Axes[1].Wait();
             if (BGW_Auto.CancellationPending) return;
-            
-            if (!int.TryParse(TB_切割次数.Text, out int cutTimes))
-            {
-                MessageBox.Show("请输入整数。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+
             isLaserWork = true;
             if (RB_模式1.Checked)
             {
-                card.Axes[0].AbsoluteMove(Convert.ToSingle(TB_起始位置.Text));
-                card.Axes[0].Wait();
+                card.Axes[0].SingleAbsoluteMove(Convert.ToSingle(TB_起始位置.Text));
                 if (BGW_Auto.CancellationPending) return;
+                suspend.WaitOne();
                 if (cutTimes % 2 != 0)
                 {
                     //int remainder = cutTimes % 2;
                     for (int i = 0; i < cutTimes / 2; i++)
                     {
                         card.Axes[1].Direction = 1;
-                        card.Axes[1].AbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
-                        card.Axes[1].Wait();
-                        card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
-                        card.Axes[0].Wait();
+                        card.Axes[1].SingleAbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
+                        card.Axes[0].SingleRelativeMove(Convert.ToSingle(TB_切割间隔.Text));
                         if (BGW_Auto.CancellationPending) return;
                         card.Axes[1].Direction = -1;
-                        card.Axes[1].AbsoluteMove(0);
-                        card.Axes[1].Wait();
-                        card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
-                        card.Axes[0].Wait();
+                        card.Axes[1].SingleAbsoluteMove(0);
+                        card.Axes[0].SingleRelativeMove(Convert.ToSingle(TB_切割间隔.Text));
                         if (BGW_Auto.CancellationPending) return;
+                        suspend.WaitOne();
                     }
                     card.Axes[1].Direction = 1;
-                    card.Axes[1].AbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
-                    card.Axes[1].Wait();
+                    card.Axes[1].SingleAbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
                 }
                 else
                 {
                     for (int i = 0; i < cutTimes / 2; i++)
                     {
                         card.Axes[1].Direction = 1;
-                        card.Axes[1].AbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
-                        card.Axes[1].Wait();
-                        card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
-                        card.Axes[0].Wait();
+                        card.Axes[1].SingleAbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
+                        card.Axes[0].SingleRelativeMove(Convert.ToSingle(TB_切割间隔.Text));
                         if (BGW_Auto.CancellationPending) return;
                         card.Axes[1].Direction = -1;
-                        card.Axes[1].AbsoluteMove(0);
-                        card.Axes[1].Wait();
-                        card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
-                        card.Axes[0].Wait();
+                        card.Axes[1].SingleAbsoluteMove(0);
+                        card.Axes[0].SingleRelativeMove(Convert.ToSingle(TB_切割间隔.Text));
                         if (BGW_Auto.CancellationPending) return;
+                        suspend.WaitOne();
                     }
                 }
             }
             if (RB_模式2.Checked)
             {
-                card.Axes[0].AbsoluteMove(Convert.ToSingle(TB_起始位置.Text));
-                card.Axes[0].Wait();
+                card.Axes[0].SingleAbsoluteMove(Convert.ToSingle(TB_起始位置.Text));
                 for (int i = 0; i < int.Parse(TB_切割次数.Text); i++)
                 {
                     isLaserWork = true;
                     card.Axes[1].Direction = 1;
-                    card.Axes[1].AbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
-                    card.Axes[1].Wait();
-                    card.Axes[0].RelativeMove(Convert.ToSingle(TB_切割间隔.Text));
-                    card.Axes[0].Wait();
+                    card.Axes[1].SingleAbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
+                    card.Axes[0].SingleRelativeMove(Convert.ToSingle(TB_切割间隔.Text));
                     isLaserWork = false;
                     card.Axes[1].Direction = -1;
-                    card.Axes[1].AbsoluteMove(0);
-                    card.Axes[1].Wait();
+                    card.Axes[1].SingleAbsoluteMove(0);
                     if (BGW_Auto.CancellationPending) return;
+                    suspend.WaitOne();
                 }
             }
 
@@ -321,7 +330,7 @@ namespace ZmotionDemo
                     }
                     else
                     {
-                        Scram();
+                        Shutdown();
                         MessageBox.Show("输入正确激光开启或关闭位置", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
@@ -345,19 +354,25 @@ namespace ZmotionDemo
                     }
                     else
                     {
-                        Scram();
+                        Shutdown();
                         MessageBox.Show("输入正确激光开启或关闭位置", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
         }
 
-        private void Scram()
+        private void AxisTimeout()
         {
-            foreach (var item in card.Axes)
-            {
-                item.Stop();
-            }
+            Shutdown();
+            MessageBox.Show("运动超时。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void Shutdown()
+        {
+            if (BGW_Auto.IsBusy) BGW_Auto.CancelAsync();
+            card.Scram();
+            isLaserWork = false;
+            card.SetOutput(int.Parse(TB_LaserSignal.Text), 0);
         }
 
         private float GetFloat(string stringValue, string message = "")
@@ -495,6 +510,7 @@ namespace ZmotionDemo
             DialogResult result = MessageBox.Show("是否切换手动模式？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
+                card.Start();
                 isAuto = false;
             }
         }
@@ -504,6 +520,7 @@ namespace ZmotionDemo
             DialogResult result = MessageBox.Show("是否自动运行？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
+                card.Start();
                 if (BGW_Auto.IsBusy)
                 {
                     MessageBox.Show("运行中。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -558,8 +575,25 @@ namespace ZmotionDemo
             DialogResult result = MessageBox.Show("是否停止？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
-                Scram();
-                card.SetOutput(int.Parse(TB_LaserSignal.Text), 0);
+                Shutdown();
+            }
+        }
+
+        private void BTN_暂停_Click(object sender, EventArgs e)
+        {
+            if (isSuspend)
+            {
+                BTN_暂停.BackColor = Color.YellowGreen;
+                BTN_暂停.Text = "继续";
+                suspend.Reset();
+                isSuspend = false;
+            }
+            else
+            {
+                BTN_暂停.BackColor = Color.Transparent;
+                BTN_暂停.Text = "暂停";
+                suspend.Set();
+                isSuspend = true;
             }
         }
         #endregion
@@ -824,6 +858,7 @@ namespace ZmotionDemo
 
         #endregion
 
+        #region 设置
         private void BTN_设置_Click(object sender, EventArgs e)
         {
             try
@@ -849,6 +884,15 @@ namespace ZmotionDemo
                 MessageBox.Show("保存失败。" + ex.Message, "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        #endregion
 
+        private void BTN_Test_Click(object sender, EventArgs e)
+        {
+            card.Start();
+            if (float.TryParse(TB_X绝对运动.Text, out var x))
+                card.Axes[0].AbsoluteMove(x);
+            if (float.TryParse(TB_Y绝对运动.Text, out var y))
+                card.Axes[1].AbsoluteMove(y);
+        }
     }
 }

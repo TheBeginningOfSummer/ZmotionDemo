@@ -30,6 +30,11 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TP_自动 = new System.Windows.Forms.TabPage();
+            this.GB_Test = new System.Windows.Forms.GroupBox();
+            this.BTN_Test = new System.Windows.Forms.Button();
+            this.LB_Test2 = new System.Windows.Forms.Label();
+            this.LB_Test1 = new System.Windows.Forms.Label();
+            this.BTN_暂停 = new System.Windows.Forms.Button();
             this.BTN_断开 = new System.Windows.Forms.Button();
             this.BTN_停止 = new System.Windows.Forms.Button();
             this.GB_模式选择 = new System.Windows.Forms.GroupBox();
@@ -41,14 +46,13 @@
             this.BTN_自动模式 = new System.Windows.Forms.Button();
             this.BTN_连接 = new System.Windows.Forms.Button();
             this.TP_手动 = new System.Windows.Forms.TabPage();
-            this.LB_YSpeed = new System.Windows.Forms.Label();
-            this.LB_XSpeed = new System.Windows.Forms.Label();
             this.GB_手动 = new System.Windows.Forms.GroupBox();
             this.BTN_手动初始位置 = new System.Windows.Forms.Button();
             this.BTN_手动X轴移动 = new System.Windows.Forms.Button();
             this.BTN_手动运行 = new System.Windows.Forms.Button();
             this.BTN_回原点 = new System.Windows.Forms.Button();
             this.GB_Y = new System.Windows.Forms.GroupBox();
+            this.LB_YSpeed = new System.Windows.Forms.Label();
             this.BTN_Y右 = new System.Windows.Forms.Button();
             this.LB_当前Y轴位置 = new System.Windows.Forms.Label();
             this.BTN_YStop = new System.Windows.Forms.Button();
@@ -60,6 +64,7 @@
             this.TB_Y绝对运动 = new System.Windows.Forms.TextBox();
             this.GB_X = new System.Windows.Forms.GroupBox();
             this.BTN_X右 = new System.Windows.Forms.Button();
+            this.LB_XSpeed = new System.Windows.Forms.Label();
             this.BTN_XStop = new System.Windows.Forms.Button();
             this.BTN_X左 = new System.Windows.Forms.Button();
             this.BTN_X绝对运动 = new System.Windows.Forms.Button();
@@ -155,8 +160,11 @@
             this.TB_AxisCode = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.BGW_Auto = new System.ComponentModel.BackgroundWorker();
+            this.label33 = new System.Windows.Forms.Label();
+            this.TB_运动超时时间 = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.TP_自动.SuspendLayout();
+            this.GB_Test.SuspendLayout();
             this.GB_模式选择.SuspendLayout();
             this.TP_手动.SuspendLayout();
             this.GB_手动.SuspendLayout();
@@ -185,6 +193,8 @@
             // 
             // TP_自动
             // 
+            this.TP_自动.Controls.Add(this.GB_Test);
+            this.TP_自动.Controls.Add(this.BTN_暂停);
             this.TP_自动.Controls.Add(this.BTN_断开);
             this.TP_自动.Controls.Add(this.BTN_停止);
             this.TP_自动.Controls.Add(this.GB_模式选择);
@@ -201,10 +211,62 @@
             this.TP_自动.Text = "自动";
             this.TP_自动.UseVisualStyleBackColor = true;
             // 
+            // GB_Test
+            // 
+            this.GB_Test.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.GB_Test.Controls.Add(this.BTN_Test);
+            this.GB_Test.Controls.Add(this.LB_Test2);
+            this.GB_Test.Controls.Add(this.LB_Test1);
+            this.GB_Test.Location = new System.Drawing.Point(553, 6);
+            this.GB_Test.Name = "GB_Test";
+            this.GB_Test.Size = new System.Drawing.Size(233, 151);
+            this.GB_Test.TabIndex = 10;
+            this.GB_Test.TabStop = false;
+            this.GB_Test.Text = "测试";
+            // 
+            // BTN_Test
+            // 
+            this.BTN_Test.Location = new System.Drawing.Point(143, 19);
+            this.BTN_Test.Name = "BTN_Test";
+            this.BTN_Test.Size = new System.Drawing.Size(75, 23);
+            this.BTN_Test.TabIndex = 2;
+            this.BTN_Test.Text = "测试";
+            this.BTN_Test.UseVisualStyleBackColor = true;
+            this.BTN_Test.Click += new System.EventHandler(this.BTN_Test_Click);
+            // 
+            // LB_Test2
+            // 
+            this.LB_Test2.AutoSize = true;
+            this.LB_Test2.Location = new System.Drawing.Point(14, 56);
+            this.LB_Test2.Name = "LB_Test2";
+            this.LB_Test2.Size = new System.Drawing.Size(35, 12);
+            this.LB_Test2.TabIndex = 1;
+            this.LB_Test2.Text = "测试2";
+            // 
+            // LB_Test1
+            // 
+            this.LB_Test1.AutoSize = true;
+            this.LB_Test1.Location = new System.Drawing.Point(14, 30);
+            this.LB_Test1.Name = "LB_Test1";
+            this.LB_Test1.Size = new System.Drawing.Size(35, 12);
+            this.LB_Test1.TabIndex = 0;
+            this.LB_Test1.Text = "测试1";
+            // 
+            // BTN_暂停
+            // 
+            this.BTN_暂停.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.BTN_暂停.Location = new System.Drawing.Point(516, 291);
+            this.BTN_暂停.Name = "BTN_暂停";
+            this.BTN_暂停.Size = new System.Drawing.Size(75, 23);
+            this.BTN_暂停.TabIndex = 9;
+            this.BTN_暂停.Text = "暂停";
+            this.BTN_暂停.UseVisualStyleBackColor = true;
+            this.BTN_暂停.Click += new System.EventHandler(this.BTN_暂停_Click);
+            // 
             // BTN_断开
             // 
             this.BTN_断开.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.BTN_断开.Location = new System.Drawing.Point(186, 304);
+            this.BTN_断开.Location = new System.Drawing.Point(185, 341);
             this.BTN_断开.Name = "BTN_断开";
             this.BTN_断开.Size = new System.Drawing.Size(75, 23);
             this.BTN_断开.TabIndex = 8;
@@ -215,11 +277,11 @@
             // BTN_停止
             // 
             this.BTN_停止.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.BTN_停止.Location = new System.Drawing.Point(666, 304);
+            this.BTN_停止.Location = new System.Drawing.Point(516, 341);
             this.BTN_停止.Name = "BTN_停止";
             this.BTN_停止.Size = new System.Drawing.Size(75, 23);
             this.BTN_停止.TabIndex = 7;
-            this.BTN_停止.Text = "全部停止";
+            this.BTN_停止.Text = "急停";
             this.BTN_停止.UseVisualStyleBackColor = true;
             this.BTN_停止.Click += new System.EventHandler(this.BTN_停止_Click);
             // 
@@ -260,7 +322,7 @@
             // BTN_自动停止
             // 
             this.BTN_自动停止.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.BTN_自动停止.Location = new System.Drawing.Point(569, 304);
+            this.BTN_自动停止.Location = new System.Drawing.Point(407, 341);
             this.BTN_自动停止.Name = "BTN_自动停止";
             this.BTN_自动停止.Size = new System.Drawing.Size(75, 23);
             this.BTN_自动停止.TabIndex = 4;
@@ -271,7 +333,7 @@
             // BTN_自动运行
             // 
             this.BTN_自动运行.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.BTN_自动运行.Location = new System.Drawing.Point(474, 304);
+            this.BTN_自动运行.Location = new System.Drawing.Point(407, 291);
             this.BTN_自动运行.Name = "BTN_自动运行";
             this.BTN_自动运行.Size = new System.Drawing.Size(75, 23);
             this.BTN_自动运行.TabIndex = 3;
@@ -282,7 +344,7 @@
             // BTN_手动模式
             // 
             this.BTN_手动模式.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.BTN_手动模式.Location = new System.Drawing.Point(376, 304);
+            this.BTN_手动模式.Location = new System.Drawing.Point(295, 341);
             this.BTN_手动模式.Name = "BTN_手动模式";
             this.BTN_手动模式.Size = new System.Drawing.Size(75, 23);
             this.BTN_手动模式.TabIndex = 2;
@@ -293,7 +355,7 @@
             // BTN_自动模式
             // 
             this.BTN_自动模式.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.BTN_自动模式.Location = new System.Drawing.Point(279, 304);
+            this.BTN_自动模式.Location = new System.Drawing.Point(295, 291);
             this.BTN_自动模式.Name = "BTN_自动模式";
             this.BTN_自动模式.Size = new System.Drawing.Size(75, 23);
             this.BTN_自动模式.TabIndex = 1;
@@ -304,7 +366,7 @@
             // BTN_连接
             // 
             this.BTN_连接.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.BTN_连接.Location = new System.Drawing.Point(88, 304);
+            this.BTN_连接.Location = new System.Drawing.Point(185, 291);
             this.BTN_连接.Name = "BTN_连接";
             this.BTN_连接.Size = new System.Drawing.Size(75, 23);
             this.BTN_连接.TabIndex = 0;
@@ -324,24 +386,6 @@
             this.TP_手动.TabIndex = 1;
             this.TP_手动.Text = "手动";
             this.TP_手动.UseVisualStyleBackColor = true;
-            // 
-            // LB_YSpeed
-            // 
-            this.LB_YSpeed.AutoSize = true;
-            this.LB_YSpeed.Location = new System.Drawing.Point(6, 135);
-            this.LB_YSpeed.Name = "LB_YSpeed";
-            this.LB_YSpeed.Size = new System.Drawing.Size(47, 12);
-            this.LB_YSpeed.TabIndex = 4;
-            this.LB_YSpeed.Text = "Y轴速度";
-            // 
-            // LB_XSpeed
-            // 
-            this.LB_XSpeed.AutoSize = true;
-            this.LB_XSpeed.Location = new System.Drawing.Point(6, 135);
-            this.LB_XSpeed.Name = "LB_XSpeed";
-            this.LB_XSpeed.Size = new System.Drawing.Size(47, 12);
-            this.LB_XSpeed.TabIndex = 3;
-            this.LB_XSpeed.Text = "X轴速度";
             // 
             // GB_手动
             // 
@@ -414,6 +458,15 @@
             this.GB_Y.TabIndex = 1;
             this.GB_Y.TabStop = false;
             this.GB_Y.Text = "Y轴";
+            // 
+            // LB_YSpeed
+            // 
+            this.LB_YSpeed.AutoSize = true;
+            this.LB_YSpeed.Location = new System.Drawing.Point(6, 135);
+            this.LB_YSpeed.Name = "LB_YSpeed";
+            this.LB_YSpeed.Size = new System.Drawing.Size(47, 12);
+            this.LB_YSpeed.TabIndex = 4;
+            this.LB_YSpeed.Text = "Y轴速度";
             // 
             // BTN_Y右
             // 
@@ -530,6 +583,15 @@
             this.BTN_X右.UseVisualStyleBackColor = true;
             this.BTN_X右.Click += new System.EventHandler(this.BTN_X右_Click);
             // 
+            // LB_XSpeed
+            // 
+            this.LB_XSpeed.AutoSize = true;
+            this.LB_XSpeed.Location = new System.Drawing.Point(6, 135);
+            this.LB_XSpeed.Name = "LB_XSpeed";
+            this.LB_XSpeed.Size = new System.Drawing.Size(47, 12);
+            this.LB_XSpeed.TabIndex = 3;
+            this.LB_XSpeed.Text = "X轴速度";
+            // 
             // BTN_XStop
             // 
             this.BTN_XStop.Location = new System.Drawing.Point(72, 97);
@@ -608,6 +670,8 @@
             // 
             // TP_设置
             // 
+            this.TP_设置.Controls.Add(this.TB_运动超时时间);
+            this.TP_设置.Controls.Add(this.label33);
             this.TP_设置.Controls.Add(this.BTN_设置);
             this.TP_设置.Controls.Add(this.TB_IP);
             this.TP_设置.Controls.Add(this.LB_IP);
@@ -1437,6 +1501,23 @@
             this.label18.TabIndex = 0;
             this.label18.Text = "轴号";
             // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(515, 173);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(77, 12);
+            this.label33.TabIndex = 9;
+            this.label33.Text = "运动超时时间";
+            // 
+            // TB_运动超时时间
+            // 
+            this.TB_运动超时时间.Location = new System.Drawing.Point(599, 170);
+            this.TB_运动超时时间.Name = "TB_运动超时时间";
+            this.TB_运动超时时间.Size = new System.Drawing.Size(40, 21);
+            this.TB_运动超时时间.TabIndex = 10;
+            this.TB_运动超时时间.Text = "20";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1449,6 +1530,8 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.tabControl1.ResumeLayout(false);
             this.TP_自动.ResumeLayout(false);
+            this.GB_Test.ResumeLayout(false);
+            this.GB_Test.PerformLayout();
             this.GB_模式选择.ResumeLayout(false);
             this.GB_模式选择.PerformLayout();
             this.TP_手动.ResumeLayout(false);
@@ -1601,6 +1684,13 @@
         private System.Windows.Forms.TextBox TB_YFastDec;
         private System.Windows.Forms.TextBox TB_XFastDec;
         private System.Windows.Forms.Button BTN_断开;
+        private System.Windows.Forms.Button BTN_暂停;
+        private System.Windows.Forms.GroupBox GB_Test;
+        private System.Windows.Forms.Label LB_Test2;
+        private System.Windows.Forms.Label LB_Test1;
+        private System.Windows.Forms.Button BTN_Test;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.TextBox TB_运动超时时间;
     }
 }
 
