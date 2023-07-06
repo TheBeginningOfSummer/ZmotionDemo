@@ -9,12 +9,14 @@ namespace ZmotionDemo
 {
     public partial class Form1 : Form
     {
+        #region 组件与控制变量
         readonly KeyValueLoader config = new KeyValueLoader("Configuration.json", "Config");
         readonly MotionControlCard card = new MotionControlCard();
         readonly ManualResetEvent suspend = new ManualResetEvent(true);
         private bool isAuto = false;
         private bool isLaserWork = false;
         private bool isSuspend = true;
+        #endregion
 
         public Form1()
         {
@@ -46,6 +48,7 @@ namespace ZmotionDemo
             }
         }
 
+        #region 事件委托
         private void BGW_Auto_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             isLaserWork = false;
@@ -70,6 +73,83 @@ namespace ZmotionDemo
             }
         }
 
+        private void YAxisMoving(float position)
+        {
+            if (!isLaserWork) return;
+            if (int.TryParse(TB_LaserSignal.Text, out int laserSignal))
+            {
+                if (RB_模式1.Checked)
+                {
+                    if (float.TryParse(TB_LaserOnPos.Text, out float laserOnPos) && float.TryParse(TB_LaserOffPos.Text, out float laserOffPos))
+                    {
+                        if (card.Axes[1].Direction > 0)
+                        {
+                            if (position > laserOnPos)
+                            {
+                                //开激光
+                                card.SetOutput(laserSignal, 1);
+                            }
+                            if (position > laserOffPos)
+                            {
+                                //关激光
+                                card.SetOutput(laserSignal, 0);
+                            }
+                        }
+                        else if (card.Axes[1].Direction < 0)
+                        {
+                            if (position < laserOnPos)
+                            {
+                                //关激光
+                                card.SetOutput(laserSignal, 0);
+                            }
+                            if (position < laserOffPos && position > laserOnPos)
+                            {
+                                //开激光
+                                card.SetOutput(laserSignal, 1);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Shutdown();
+                        MessageBox.Show("输入正确激光开启或关闭位置", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                if (RB_模式2.Checked)
+                {
+                    if (float.TryParse(TB_LaserOnPos.Text, out float laserOnPos) && float.TryParse(TB_LaserOffPos.Text, out float laserOffPos))
+                    {
+                        if (card.Axes[1].Direction > 0)
+                        {
+                            if (position > laserOnPos)
+                            {
+                                //开激光
+                                card.SetOutput(laserSignal, 1);
+                            }
+                            if (position > laserOffPos)
+                            {
+                                //关激光
+                                card.SetOutput(laserSignal, 0);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Shutdown();
+                        MessageBox.Show("输入正确激光开启或关闭位置", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+        }
+
+        private void AxisTimeout()
+        {
+            Shutdown();
+            MessageBox.Show("运动超时。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        #endregion
+
         #region 方法
         public static void OnThread(Control control, Action method)
         {
@@ -81,6 +161,7 @@ namespace ZmotionDemo
 
         public void InitializeAxes()
         {
+            card.Axes.Clear();
             card.AddAxis(GetInt(TB_XAxisType.Text, "X轴类型读取失败。"), 0, GetFloat(TB_X脉冲当量.Text, "脉冲当量X读取失败。"));
             card.AddAxis(GetInt(TB_YAxisType.Text, "Y轴类型读取失败。"), 1, GetFloat(TB_Y脉冲当量.Text, "脉冲当量Y读取失败。"));
         }
@@ -236,7 +317,7 @@ namespace ZmotionDemo
             isLaserWork = true;
             if (RB_模式1.Checked)
             {
-                card.Axes[0].SingleAbsoluteMove(Convert.ToSingle(TB_起始位置.Text));
+                card.Axes[0].SingleAbsoluteMove(GetFloat(TB_起始位置.Text, "X轴位置读取失败。"), timeout);
                 if (BGW_Auto.CancellationPending) return;
                 suspend.WaitOne();
                 if (cutTimes % 2 != 0)
@@ -245,43 +326,43 @@ namespace ZmotionDemo
                     for (int i = 0; i < cutTimes / 2; i++)
                     {
                         card.Axes[1].Direction = 1;
-                        card.Axes[1].SingleAbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
-                        card.Axes[0].SingleRelativeMove(Convert.ToSingle(TB_切割间隔.Text));
+                        card.Axes[1].SingleAbsoluteMove(GetFloat(TB_终止位置.Text, "Y轴位置读取失败。"), timeout);
+                        card.Axes[0].SingleRelativeMove(GetFloat(TB_切割间隔.Text, "X轴位置读取失败。"), timeout);
                         if (BGW_Auto.CancellationPending) return;
                         card.Axes[1].Direction = -1;
-                        card.Axes[1].SingleAbsoluteMove(0);
-                        card.Axes[0].SingleRelativeMove(Convert.ToSingle(TB_切割间隔.Text));
+                        card.Axes[1].SingleAbsoluteMove(0, timeout);
+                        card.Axes[0].SingleRelativeMove(GetFloat(TB_切割间隔.Text, "X轴位置读取失败。"), timeout);
                         if (BGW_Auto.CancellationPending) return;
                         suspend.WaitOne();
                     }
                     card.Axes[1].Direction = 1;
-                    card.Axes[1].SingleAbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
+                    card.Axes[1].SingleAbsoluteMove(GetFloat(TB_终止位置.Text, "Y轴位置读取失败。"), timeout);
                 }
                 else
                 {
                     for (int i = 0; i < cutTimes / 2; i++)
                     {
                         card.Axes[1].Direction = 1;
-                        card.Axes[1].SingleAbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
-                        card.Axes[0].SingleRelativeMove(Convert.ToSingle(TB_切割间隔.Text));
+                        card.Axes[1].SingleAbsoluteMove(GetFloat(TB_终止位置.Text, "Y轴位置读取失败。"), timeout);
+                        card.Axes[0].SingleRelativeMove(GetFloat(TB_切割间隔.Text, "X轴位置读取失败。"), timeout);
                         if (BGW_Auto.CancellationPending) return;
                         card.Axes[1].Direction = -1;
                         card.Axes[1].SingleAbsoluteMove(0);
-                        card.Axes[0].SingleRelativeMove(Convert.ToSingle(TB_切割间隔.Text));
+                        card.Axes[0].SingleRelativeMove(GetFloat(TB_切割间隔.Text, "X轴位置读取失败。"), timeout);
                         if (BGW_Auto.CancellationPending) return;
                         suspend.WaitOne();
                     }
                 }
             }
-            if (RB_模式2.Checked)
+            else if (RB_模式2.Checked)
             {
-                card.Axes[0].SingleAbsoluteMove(Convert.ToSingle(TB_起始位置.Text));
+                card.Axes[0].SingleAbsoluteMove(GetFloat(TB_起始位置.Text, "X轴位置读取失败。"), timeout);
                 for (int i = 0; i < int.Parse(TB_切割次数.Text); i++)
                 {
                     isLaserWork = true;
                     card.Axes[1].Direction = 1;
-                    card.Axes[1].SingleAbsoluteMove(Convert.ToSingle(TB_终止位置.Text));
-                    card.Axes[0].SingleRelativeMove(Convert.ToSingle(TB_切割间隔.Text));
+                    card.Axes[1].SingleAbsoluteMove(GetFloat(TB_终止位置.Text, "Y轴位置读取失败。"), timeout);
+                    card.Axes[0].SingleRelativeMove(GetFloat(TB_切割间隔.Text, "X轴位置读取失败。"), timeout);
                     isLaserWork = false;
                     card.Axes[1].Direction = -1;
                     card.Axes[1].SingleAbsoluteMove(0);
@@ -289,82 +370,6 @@ namespace ZmotionDemo
                     suspend.WaitOne();
                 }
             }
-
-        }
-
-        private void YAxisMoving(float position)
-        {
-            if (!isLaserWork) return;
-            if (int.TryParse(TB_LaserSignal.Text, out int laserSignal))
-            {
-                if (RB_模式1.Checked)
-                {
-                    if (float.TryParse(TB_LaserOnPos.Text, out float laserOnPos) && float.TryParse(TB_LaserOffPos.Text, out float laserOffPos))
-                    {
-                        if (card.Axes[1].Direction > 0)
-                        {
-                            if (position > laserOnPos)
-                            {
-                                //开激光
-                                card.SetOutput(laserSignal, 1);
-                            }
-                            if (position > laserOffPos)
-                            {
-                                //关激光
-                                card.SetOutput(laserSignal, 0);
-                            }
-                        }
-                        else if (card.Axes[1].Direction < 0)
-                        {
-                            if (position < laserOnPos)
-                            {
-                                //关激光
-                                card.SetOutput(laserSignal, 0);
-                            }
-                            if (position < laserOffPos && position > laserOnPos)
-                            {
-                                //开激光
-                                card.SetOutput(laserSignal, 1);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Shutdown();
-                        MessageBox.Show("输入正确激光开启或关闭位置", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                }
-                if (RB_模式2.Checked)
-                {
-                    if (float.TryParse(TB_LaserOnPos.Text, out float laserOnPos) && float.TryParse(TB_LaserOffPos.Text, out float laserOffPos))
-                    {
-                        if (card.Axes[1].Direction > 0)
-                        {
-                            if (position > laserOnPos)
-                            {
-                                //开激光
-                                card.SetOutput(laserSignal, 1);
-                            }
-                            if (position > laserOffPos)
-                            {
-                                //关激光
-                                card.SetOutput(laserSignal, 0);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Shutdown();
-                        MessageBox.Show("输入正确激光开启或关闭位置", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                }
-            }
-        }
-
-        private void AxisTimeout()
-        {
-            Shutdown();
-            MessageBox.Show("运动超时。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void Shutdown()
@@ -382,7 +387,10 @@ namespace ZmotionDemo
             else
             {
                 if (message != "")
+                {
                     MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Shutdown();
+                }
                 return 0;
             }
         }
@@ -394,7 +402,10 @@ namespace ZmotionDemo
             else
             {
                 if (message != "")
+                {
                     MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Shutdown();
+                }
                 return 0;
             }
         }
@@ -886,6 +897,7 @@ namespace ZmotionDemo
         }
         #endregion
 
+        #region 测试
         private void BTN_Test_Click(object sender, EventArgs e)
         {
             card.Start();
@@ -894,5 +906,6 @@ namespace ZmotionDemo
             if (float.TryParse(TB_Y绝对运动.Text, out var y))
                 card.Axes[1].AbsoluteMove(y);
         }
+        #endregion
     }
 }

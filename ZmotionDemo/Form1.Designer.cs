@@ -74,6 +74,8 @@
             this.LB_当前X轴位置 = new System.Windows.Forms.Label();
             this.BTN_X回原点 = new System.Windows.Forms.Button();
             this.TP_设置 = new System.Windows.Forms.TabPage();
+            this.TB_运动超时时间 = new System.Windows.Forms.TextBox();
+            this.label33 = new System.Windows.Forms.Label();
             this.BTN_设置 = new System.Windows.Forms.Button();
             this.TB_IP = new System.Windows.Forms.TextBox();
             this.LB_IP = new System.Windows.Forms.Label();
@@ -160,8 +162,6 @@
             this.TB_AxisCode = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.BGW_Auto = new System.ComponentModel.BackgroundWorker();
-            this.label33 = new System.Windows.Forms.Label();
-            this.TB_运动超时时间 = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.TP_自动.SuspendLayout();
             this.GB_Test.SuspendLayout();
@@ -685,6 +685,23 @@
             this.TP_设置.TabIndex = 2;
             this.TP_设置.Text = "设置";
             this.TP_设置.UseVisualStyleBackColor = true;
+            // 
+            // TB_运动超时时间
+            // 
+            this.TB_运动超时时间.Location = new System.Drawing.Point(599, 170);
+            this.TB_运动超时时间.Name = "TB_运动超时时间";
+            this.TB_运动超时时间.Size = new System.Drawing.Size(40, 21);
+            this.TB_运动超时时间.TabIndex = 10;
+            this.TB_运动超时时间.Text = "0";
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(515, 173);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(77, 12);
+            this.label33.TabIndex = 9;
+            this.label33.Text = "运动超时时间";
             // 
             // BTN_设置
             // 
@@ -1500,23 +1517,6 @@
             this.label18.Size = new System.Drawing.Size(29, 12);
             this.label18.TabIndex = 0;
             this.label18.Text = "轴号";
-            // 
-            // label33
-            // 
-            this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(515, 173);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(77, 12);
-            this.label33.TabIndex = 9;
-            this.label33.Text = "运动超时时间";
-            // 
-            // TB_运动超时时间
-            // 
-            this.TB_运动超时时间.Location = new System.Drawing.Point(599, 170);
-            this.TB_运动超时时间.Name = "TB_运动超时时间";
-            this.TB_运动超时时间.Size = new System.Drawing.Size(40, 21);
-            this.TB_运动超时时间.TabIndex = 10;
-            this.TB_运动超时时间.Text = "20";
             // 
             // Form1
             // 
