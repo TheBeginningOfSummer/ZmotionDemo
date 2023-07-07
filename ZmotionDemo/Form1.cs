@@ -40,11 +40,15 @@ namespace ZmotionDemo
                     card.Axes[1].AbsoluteMove(0);
                 }
                 else
+                {
                     MessageBox.Show("控制器链接失败，请检测IP地址!", "警告");
+                    MessageRecorder.RecordError("控制卡连接失败。", "检查连接参数与连接线，重启程序。");
+                }
             }
             catch (Exception e)
             {
-                MessageBox.Show("连接失败。" + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"初始化控制卡失败。{e.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageRecorder.RecordError($"初始化控制卡失败。{e.Message}", "检查连接与参数设置。");
             }
         }
 
@@ -146,6 +150,7 @@ namespace ZmotionDemo
         {
             Shutdown();
             MessageBox.Show("运动超时。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageRecorder.RecordError($"运动超时。", "检查超时时间设置。");
         }
 
         #endregion
@@ -390,6 +395,7 @@ namespace ZmotionDemo
                 {
                     MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Shutdown();
+                    MessageRecorder.RecordError($"读取float参数失败。", "检查输入参数。");
                 }
                 return 0;
             }
@@ -405,6 +411,7 @@ namespace ZmotionDemo
                 {
                     MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Shutdown();
+                    MessageRecorder.RecordError($"读取int参数失败。", "检查输入参数。");
                 }
                 return 0;
             }
@@ -426,11 +433,13 @@ namespace ZmotionDemo
                 else
                 {
                     MessageBox.Show("输入正确轴号", "校准", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageRecorder.RecordError($"读取轴号失败。", "输入正确轴号进行回零校准。");
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("回零失败。" + ex.Message, "校准", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageRecorder.RecordError($"回零校准失败。{ex.Message}", "检查回零设置。");
             }
         }
 
