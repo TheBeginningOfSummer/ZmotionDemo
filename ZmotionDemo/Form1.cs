@@ -24,6 +24,7 @@ namespace ZmotionDemo
             try
             {
                 LoadConfig();
+                MessageRecorder.DocumentPath = "Log";
                 if (card.Connect(TB_IP.Text))
                 {
                     MessageBox.Show("控制器链接成功!", "提示");

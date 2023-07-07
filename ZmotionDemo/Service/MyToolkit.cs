@@ -238,8 +238,7 @@ namespace ZmotionDemo
     /// </summary>
     public class MessageRecorder
     {
-        //public static readonly Java.IO.File Storage = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments);
-        public static readonly string DocumentPath = "/storage/emulated/0/Documents";
+        public static string DocumentPath = "/storage/emulated/0/Documents";
         public static readonly string ConfigurationPath = "/storage/emulated/0/Configuration";
 
         public static void RecordError(string error, string solution)
